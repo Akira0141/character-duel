@@ -79,7 +79,6 @@ header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 24px;borde
 .fighter.R{right:26%}
 .fighter img{max-height:138px;max-width:108px;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
 .fighter svg{width:84px;height:132px}
-.fighter.R>*{transform:scaleX(-1)}
 .lungeR{transform:translateX(62px) rotate(-4deg)}
 .lungeL{transform:translateX(-62px) rotate(4deg)}
 .hitshake{animation:shake .32s linear}
@@ -102,7 +101,8 @@ header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 24px;borde
   filter:drop-shadow(0 6px 10px rgba(0,0,0,.65));font-variant-numeric:tabular-nums}
 .die.tumble{animation:tumble .12s linear infinite}
 @keyframes tumble{0%{transform:rotate(-9deg) translateY(-3px)}50%{transform:rotate(8deg) translateY(3px)}100%{transform:rotate(-9deg) translateY(-3px)}}
-.die.tens{background:linear-gradient(160deg,#E4D6A8,#B9A26A)}
+.die.tens{background:linear-gradient(160deg,#F2CBC2,#C4564A);color:#33100B}
+.die.ones{background:linear-gradient(160deg,#CFE1F4,#6E9BD0);color:#0B1B2E}
 .dieres{font-family:var(--disp);font-size:24px;font-weight:800;color:var(--phos);
   text-shadow:0 2px 10px #000,0 0 14px rgba(0,0,0,.9);letter-spacing:.06em;
   opacity:0;transition:opacity .15s;font-variant-numeric:tabular-nums}
@@ -141,6 +141,8 @@ button.ghost{background:transparent;border:1px solid var(--line);color:var(--par
   font-size:13px;border-radius:2px;cursor:pointer;font-family:var(--ui)}
 button.ghost:hover{color:var(--parch);border-color:var(--azure)}
 button.ghost[aria-pressed="true"]{color:var(--phos);border-color:var(--phos)}
+.sk.defrow{grid-template-columns:1fr 152px;margin-top:7px}
+.sk.defrow select{font-family:var(--ui);font-size:12.5px;padding:5px 8px;cursor:pointer}
 .speed{display:flex;gap:0;border:1px solid var(--line);border-radius:2px;overflow:hidden}
 .speed button{border:0;border-left:1px solid var(--line);border-radius:0}
 .speed button:first-child{border-left:0}
@@ -160,6 +162,10 @@ button.ghost[aria-pressed="true"]{color:var(--phos);border-color:var(--phos)}
 .pal button:hover{transform:scale(1.15)}
 .freewrap{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
 .sk.free input[data-f]{font-size:12.5px;text-align:left}
+.impale{display:flex;align-items:center;gap:7px;margin:9px 0 0;font-size:11.5px;letter-spacing:0;
+  color:var(--parch-dim);cursor:pointer}
+.impale input{width:14px;height:14px;flex:none;accent-color:var(--phos);cursor:pointer}
+.impale:hover{color:var(--parch)}
 .card>header .tag{font-family:var(--mono);font-size:11px;color:var(--ink);background:var(--phos);padding:2px 8px;font-weight:600}
 .card.b>header .tag{background:var(--azure);color:#04121E}
 .card>header input{flex:1;min-width:0}
@@ -174,9 +180,15 @@ input:focus,textarea:focus{border-color:var(--azure);outline:none}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 .row-io{display:flex;gap:8px;margin-bottom:12px}
 .row-io button{flex:1}
+.dbnote{margin:6px 0 0;font-size:11px;color:var(--parch-dim);line-height:1.6}
+.dbnote.calc{color:var(--phos)}
+input.dbcalc{border-color:var(--phos);box-shadow:0 0 0 1px rgba(201,162,39,.25)}
 .skills{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
 .skills h4{margin:0 0 9px;font-size:11.5px;letter-spacing:.12em;color:var(--parch-dim);font-weight:500}
-.sk{display:grid;grid-template-columns:1fr 62px 84px;gap:7px;align-items:center;margin-bottom:5px}
+.sk{display:grid;grid-template-columns:1fr 58px 112px;gap:7px;align-items:center;margin-bottom:5px}
+.wcell{display:flex;align-items:center;gap:5px;min-width:0}
+.wcell input{flex:1;min-width:0}
+.wcell em{font-style:normal;font-size:10.5px;color:var(--parch-dim);white-space:nowrap;letter-spacing:.02em}
 .sk span{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sk input{padding:4px 7px;font-size:13px;text-align:right}
 .sk input.wpn{text-align:center;font-size:12px}
@@ -242,15 +254,15 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 
 <div class="systems" role="group" aria-label="システム選択">
   <button class="sysbtn" data-sys="coc6" aria-pressed="true">クトゥルフ神話TRPG（6版）</button>
-  <button class="sysbtn" data-sys="coc7" aria-pressed="false" disabled>新クトゥルフ神話TRPG（7版・準備中）</button>
+  <button class="sysbtn" data-sys="coc7" aria-pressed="false">新クトゥルフ神話TRPG（7版）</button>
   <button class="sysbtn" data-sys="emo" aria-pressed="false" disabled>エモクロア／ガイアケア（準備中）</button>
 </div>
 <details class="sysnote" id="sysnote"><summary>レギュレーション</summary><div class="sysbody"></div></details>
 
 <div class="arena" id="arena">
   <div class="gauges">
-    <div class="gauge L"><span class="nm" id="gn0">探索者A</span><div class="bar" id="gb0"><i style="width:100%"></i></div><span class="hpnum" id="gh0">HP 13 / 13</span></div>
-    <div class="gauge R"><span class="nm" id="gn1">探索者B</span><div class="bar" id="gb1"><i style="width:100%"></i></div><span class="hpnum" id="gh1">HP 12 / 12</span></div>
+    <div class="gauge L"><span class="nm" id="gn0">キャラクターA</span><div class="bar" id="gb0"><i style="width:100%"></i></div><span class="hpnum" id="gh0">HP 13 / 13</span></div>
+    <div class="gauge R"><span class="nm" id="gn1">キャラクターB</span><div class="bar" id="gb1"><i style="width:100%"></i></div><span class="hpnum" id="gh1">HP 12 / 12</span></div>
   </div>
   <div class="fighter L" id="f0"></div>
   <div class="fighter R" id="f1"></div>
@@ -297,6 +309,8 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
         <li><b>いあきゃら（iachara）</b>…「出力」⇒「ココフォリア駒出力」を選択後、ペースト</li>
         <li><b>キャラエノ（charaeno）</b>…「ココフォリア コマ」⇒「コピー」を選択後、ペースト</li>
       </ul>
+      <b>ダメージボーナスについて</b><br>
+      貼り付けたデータに<b>ダメージボーナス（DB）</b>が含まれていれば、その値をそのまま使います。含まれていない場合のみ STR＋SIZ から自動算出します（いあきゃらのココフォリア駒出力にはDBが含まれないため、自動算出になります）。シート上でDBを手動で変更している場合は、読み込み後にDB欄を直接書き換えてください。<br><br>
       反映後は念のため数値を目視で確認してください。書式の違いで拾い漏れた項目は手入力できます。
     </p>
     <div class="status" id="dlgStatus"></div>
@@ -306,7 +320,7 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 <script>
 "use strict";
 /* ============================================================
-   探索者決闘場 — 自動戦闘エンジン
+   キャラクター決闘場 — 自動戦闘エンジン
    ============================================================ */
 
 /* ---------- dice ---------- */
@@ -354,7 +368,7 @@ const SYS = {
   coc6:{
     name:"クトゥルフ神話TRPG（6版）",
     cmd:"CCB<=",
-    note:"<b>▼レギュレーション</b><br>判定は<b>CCB</b>。<br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br><b>1〜5でクリティカル</b>（回避不可・最大ダメージ）、<b>96〜100でファンブル</b>（次回攻撃不可）。<br>武道はマーシャルアーツと同じ扱い（dbを省くダメージ2倍）、素手技能と組み合わせロール。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は抽選。<br>銃火器は1R1発。",
+    note:"<b>▼レギュレーション</b><br>判定は<b>CCB</b>。<br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br><b>1〜5でクリティカル</b>（回避不可・最大ダメージ）、<b>96〜100でファンブル</b>（次回攻撃不可）。<br>武道はマーシャルアーツと同じ扱い（dbを省くダメージ2倍）、素手技能と組み合わせロール。<br>銃火器Rは無し。自分のターンで1発のみ撃つ。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は抽選。<br>特殊な武器は最下部の「自由記入枠」に手動で入れてください。",
     shock:c=>c.con*5, shockLabel:c=>"CON×5="+(c.con*5),
     db:(str,siz)=>{const t=str+siz;
       if(t<=12)return"-1d6"; if(t<=16)return"-1d4"; if(t<=24)return"0";
@@ -363,8 +377,8 @@ const SYS = {
   },
   coc7:{
     name:"新クトゥルフ神話TRPG（7版）",
-    cmd:"CCB<=",
-    note:"ショックロールは <b>CON</b> 目標（7版の重傷ルール準拠）。ダメージボーナスは STR+SIZ から7版表で自動算出。判定は 1d100、<b>1でクリティカル</b>、<b>100（技能50未満は96〜100）でファンブル</b>。",
+    cmd:"CC<=",
+    note:"<b>▼レギュレーション</b><br>判定は<b>CC</b>。<br><br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br>近接戦闘を受けた時の対応は<b>キャラクターごとに「回避」か「応戦」</b>を設定（戦闘中に変更した場合は以降のターンから反映）。デフォルトは回避。<br>射撃・飛び道具に対しては常に<b>「身を隠す」</b>扱いで回避のみ。応戦は選べない。<br>射撃関連のルールが複雑であるため、一律で攻撃側平目、受動側は回避で処理。1R1発。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は抽選。<br>特殊な武器は最下部の「自由記入枠」に手動で入れてください。",
     shock:c=>c.con, shockLabel:c=>"CON="+c.con,
     db:(str,siz)=>{const t=str+siz;
       if(t<=64)return"-2"; if(t<=84)return"-1"; if(t<=124)return"0";
@@ -376,7 +390,7 @@ let sysKey="coc6";
 const sys = ()=>SYS[sysKey];
 
 /* ---------- attacks ---------- */
-const ATK = [
+const ATK6 = [
   {k:"kick",     n:"キック",           dice:"1d6",  db:"full", ma:true},
   {k:"grapple",  n:"組み付き",         dice:"1d6",  db:"full", ma:true},
   {k:"punch",    n:"こぶし（パンチ）", dice:"1d3",  db:"full", ma:true},
@@ -390,10 +404,18 @@ const ATK = [
   {k:"katana",   n:"日本刀",           dice:"1d10", db:"full"},
   {k:"knife",    n:"ナイフ",           wpn:"1d4",   db:"full"}
 ];
+const ATK7 = [
+  {k:"fight", n:"近接戦闘（格闘）", dice:"1d3", db:"full", melee:true},
+  {k:"sword", n:"近接戦闘（刀剣）", wpn:"1d10", db:"full", melee:true, impale:true},
+  {k:"throw", n:"投擲",             wpn:"1d3",  db:"half"},
+  {k:"shoot", n:"射撃（拳銃）",     wpn:"1d10", db:"none", impale:true}
+];
+const ALL_ATK = ATK6.concat(ATK7);
+function atks(){ return sysKey==="coc7" ? ATK7 : ATK6; }
 const MA = [{k:"martial",n:"マーシャルアーツ"},{k:"budo",n:"武道"}];
 
 /* 技能名の表記ゆれ → キー */
-const ALIAS = {
+const ALIAS6 = {
   kick:["キック","蹴り"],
   grapple:["組み付き","組みつき","組付き","くみつき"],
   punch:["こぶし","拳","パンチ","こぶし(パンチ)","こぶし（パンチ）","近接戦闘(格闘)","近接戦闘（格闘）","格闘"],
@@ -410,7 +432,15 @@ const ALIAS = {
   knife:["ナイフ","短刀","ダガー"],
   dodge:["回避","かいひ"]
 };
+const ALIAS7 = {
+  fight:["近接戦闘(格闘)","近接戦闘","格闘","こぶし(パンチ)","こぶし","パンチ"],
+  sword:["近接戦闘(刀剣)","刀剣","日本刀","刀"],
+  throw:["投擲","投てき"],
+  shoot:["射撃(拳銃)","拳銃","ハンドガン"],
+  dodge:["回避","かいひ"]
+};
 function matchSkill(raw){
+  const ALIAS = sysKey==="coc7" ? ALIAS7 : ALIAS6;
   if(!raw) return null;
   let s = String(raw).replace(/\s|　/g,"").replace(/[（）]/g,m=>m==="（"?"(":")").replace(/【|】|\[|\]/g,"");
   s = s.replace(/^(戦闘|射撃)技能?[:：]?/,"");
@@ -432,29 +462,53 @@ function matchSkill(raw){
 /* ---------- character model ---------- */
 function blank(name,color){
   const c={name:name,hp:10,con:10,dex:10,db:"0",dodge:30,img:null,color:color||"#C9A227",
-           freeName:"",skills:{},wpn:{}};
-  ATK.forEach(a=>{c.skills[a.k]=0; if(a.wpn) c.wpn[a.k]="";});
+           freeName:"",freeImpale:false,freeKind:"melee",freeDB:false,freeHalfDB:false,dbSrc:"",defMode:"dodge",skills:{},wpn:{}};
+  ALL_ATK.forEach(a=>{c.skills[a.k]=0; if(a.wpn!==undefined) c.wpn[a.k]="";});
+  ATK7.forEach(a=>{ if(a.wpn!==undefined) c.wpn[a.k]=a.wpn; });   /* 7版は仮の武器ダメージを入れておく */
   MA.forEach(a=>c.skills[a.k]=0);
   c.skills.free=0; c.wpn.free="";
   return c;
 }
 /** 自由記入枠を攻撃として扱う */
-function freeAtk(c){ return {k:"free", n:c.freeName||"独自技能", wpn:c.wpn.free, db:"none"}; }
-/* 初期表示用のサンプル探索者（例示用の数値です） */
+function freeAtk(c){
+  /* 近接／飛び道具の別は「相手が応戦を選べるか」だけを決める。DBの有無はチェックボックス */
+  return {k:"free", n:c.freeName||"独自技能", wpn:c.wpn.free, db:freeDBMode(c),
+          melee:c.freeKind!=="ranged", impale:!!c.freeImpale};
+}
+/** 自由記入枠のDB設定："full" / "half" / "none" */
+function freeDBMode(c){
+  if(sysKey==="coc7" && c.freeHalfDB) return "half";
+  return c.freeDB ? "full" : "none";
+}
+/* 初期表示用のサンプルキャラクター（例示用の数値です） */
 function sampleA(){
-  const c=blank("探索者A","#C9A227");
+  const c=blank("キャラクターA","#C9A227");
   Object.assign(c,{hp:13,con:13,dex:15,db:"1d4",dodge:65});
   Object.assign(c.skills,{kick:70,punch:55,headbutt:40,grapple:45,katana:60,martial:35});
   return c;
 }
 function sampleB(){
-  const c=blank("探索者B","#4E8FC7");
+  const c=blank("キャラクターB","#4E8FC7");
   Object.assign(c,{hp:12,con:12,dex:13,db:"0",dodge:58});
   Object.assign(c.skills,{punch:50,kick:35,handgun:65,knife:55,throw:40});
   c.wpn.handgun="1d10"; c.wpn.knife="1d4"; c.wpn.throw="1d6";
   return c;
 }
+/* 7版サンプル（例示用の数値です） */
+function sample7A(){
+  const c=blank("キャラクターA","#C9A227");
+  Object.assign(c,{hp:12,con:60,dex:65,db:"1d4",dodge:55});
+  Object.assign(c.skills,{fight:62,sword:45});
+  return c;
+}
+function sample7B(){
+  const c=blank("キャラクターB","#4E8FC7");
+  Object.assign(c,{hp:11,con:55,dex:60,db:"0",dodge:64});
+  Object.assign(c.skills,{fight:50,shoot:60,throw:40});
+  return c;
+}
 const PC=[sampleA(),sampleB()];
+let pristine=true;   /* ユーザーが未編集ならシステム切替でサンプルを差し替える */
 
 /* ---------- flavour ---------- */
 const FLAV = {
@@ -471,11 +525,15 @@ const FLAV = {
   katana:["白刃が翻り、{A}は{D}へ斬りかかった！","{A}の刀が月光のような弧を描く！","抜き打ちの一閃、{D}の胴を薙ぐ！"],
   knife:["{A}の刃が{D}の隙間を縫って走る！","短い刃が{D}の脇腹へ滑り込む！","{A}はナイフを逆手に持ち替え、踏み込んだ！"]
 };
+FLAV.fight=FLAV.punch; FLAV.sword=FLAV.katana; FLAV.shoot=FLAV.handgun;
 const F_DODGE_OK=["{D}は身を捻り、紙一重で躱した！","{D}は床を蹴って後方へ跳ぶ——掠りもしない！","寸前で{D}が体を沈める。攻撃は虚しく空を切った。","{D}の目が動きを捉えていた。難なく回避！"];
 const F_DODGE_NG=["{D}は躱そうとするが避けきれない！","反応が一瞬遅れた。{D}はまともに喰らう！","{D}の体勢が崩れていた——直撃だ！","逃げ場はなかった。{D}は受けるしかない！"];
 const F_CRIT=["完璧な一撃だ——{D}に回避の余地はない！","{A}の動きが噛み合った。狙い澄ました致命の一手！"];
 const F_FUMBLE=["{A}は大きくバランスを崩した。攻撃は空振りに終わる。","勢い余って{A}は自分の足に躓いた——好機を逃す。","{A}の手元が狂った。何も起こらない。"];
 const F_MISS=["{A}の一撃は{D}を捉えきれなかった。","わずかに届かない。{A}は悔しそうに顔を歪めた。","{A}の狙いは外れ、空気だけが鳴った。"];
+const F_COUNTER=["{D}は攻撃を受け流し、そのまま反撃に転じた！","読まれていた——{D}の体が先に動く！","{D}は{A}の腕を捌き、返す手で打ち込んだ！"];
+const F_PARRY=["{D}は{A}の攻撃を弾き返した。互いに決定打はない。","{D}が踏み込みを潰す。攻防は振り出しに戻った。"];
+const F_BOTHFAIL=["両者の刃も拳も噛み合わない。間合いだけが張り詰める。","互いに空を切る。呼吸を整え直すしかない。","{A}も{D}も捉えきれない——膠着が続く。"];
 const F_FREE=["{A}の{S}が{D}を襲う！","{A}は{S}で{D}へ仕掛けた！","間合いを詰め、{A}の{S}が唸る！","{A}は渾身の{S}を{D}へ叩き込む！"];
 const F_MA=["マーシャルアーツの理合いが乗る——威力が跳ね上がる！","鍛え抜かれた体術が一撃を別物に変える！"];
 const F_SHOCK_OK=["視界が白く濁る。それでも{A}は膝をつかなかった。","激痛。だが{A}は歯を食いしばって立っている。"];
@@ -501,10 +559,11 @@ function stick(color){
 }
 function panel(i){
   const c=PC[i], side=i===0?"A":"B";
-  const skRows = ATK.concat(MA).map(a=>{
+  const skRows = atks().concat(sysKey==="coc6"?MA:[]).map(a=>{
     const v=c.skills[a.k]||0;
+    const dbtag = a.db==="full" ? "＋DB" : (a.db==="half" ? "＋DB÷2" : "");
     const wcell = a.wpn!==undefined
-      ? `<input class="wpn" type="text" data-i="${i}" data-wpn="${a.k}" value="${c.wpn[a.k]||""}" placeholder="${a.wpn}" aria-label="${a.n}の武器ダメージ">`
+      ? `<span class="wcell"><input class="wpn" type="text" data-i="${i}" data-wpn="${a.k}" value="${c.wpn[a.k]||""}" placeholder="${a.wpn}" aria-label="${a.n}の武器ダメージ">${dbtag?`<em>${dbtag}</em>`:""}</span>`
       : `<span class="ph">${a.dice?a.dice+(a.db==="full"?"+DB":""):"—"}</span>`;
     return `<div class="sk ${v?"":"off"}" data-row="${i}-${a.k}">
       <span>${a.n}</span>
@@ -532,11 +591,17 @@ function panel(i){
         <div><label>HP</label><input type="number" data-i="${i}" data-f="hp" value="${c.hp}"></div>
         <div><label>CON</label><input type="number" data-i="${i}" data-f="con" value="${c.con}"></div>
         <div><label>DEX</label><input type="number" data-i="${i}" data-f="dex" value="${c.dex}"></div>
-        <div><label>DB</label><input type="text" data-i="${i}" data-f="db" value="${c.db}"></div>
+        <div><label>DB</label><input type="text" class="${c.dbSrc==="calc"?"dbcalc":""}" data-i="${i}" data-f="db" value="${c.db}"></div>
       </div>
+      ${c.dbSrc ? `<p class="dbnote ${c.dbSrc==="calc"?"calc":""}">DB：${c.dbSrc==="sheet"?"シートに記載された値を使用しています":"シートに記載が無いため STR+SIZ から自動算出しました。シート側で変更している場合は上のDB欄を書き換えてください"}</p>` : ""}
       <div class="skills">
         <h4>回 避</h4>
         <div class="sk"><span>回避</span><input type="number" min="0" max="100" data-i="${i}" data-f="dodge" value="${c.dodge}" aria-label="回避技能値"><span class="ph">1d100</span></div>
+        ${sysKey==="coc7" ? `<div class="sk defrow"><span>近接戦闘を受けた時</span>
+          <select data-i="${i}" data-f="defMode" aria-label="防御時の対応">
+            <option value="dodge"${c.defMode!=="fight"?" selected":""}>回避する</option>
+            <option value="fight"${c.defMode==="fight"?" selected":""}>応戦する</option>
+          </select></div>` : ""}
         <h4 style="margin-top:14px">戦 闘 技 能 ／ 武 器 ダ メ ー ジ</h4>
         ${skRows}
         <div class="freewrap">
@@ -544,9 +609,17 @@ function panel(i){
           <div class="sk free">
             <input type="text" data-i="${i}" data-f="freeName" value="${c.freeName||""}" placeholder="技能名" aria-label="独自技能の名前">
             <input type="number" min="0" max="100" data-i="${i}" data-sk="free" value="${c.skills.free||0}" aria-label="独自技能の技能値">
-            <input class="wpn" type="text" data-i="${i}" data-wpn="free" value="${c.wpn.free||""}" placeholder="1d8+1d4" aria-label="独自技能のダメージ">
+            <span class="wcell"><input class="wpn" type="text" data-i="${i}" data-wpn="free" value="${c.wpn.free||""}" placeholder="1d8" aria-label="独自技能のダメージ">${freeDBMode(c)==="half"?"<em>＋DB÷2</em>":(freeDBMode(c)==="full"?"<em>＋DB</em>":"")}</span>
           </div>
-          <p class="hint" style="margin:6px 0 0;font-size:11px">ダメージは記入した式をそのまま使います（DBを加える場合は式に含めてください）。</p>
+          <label class="impale"><input type="checkbox" data-i="${i}" data-f="freeDB"${c.freeDB?" checked":""}>ダメージボーナス（DB）を加える</label>
+          ${sysKey==="coc7" ? `<label class="impale"><input type="checkbox" data-i="${i}" data-f="freeHalfDB"${c.freeHalfDB?" checked":""}>DBを1/2だけ加える（切り捨て）</label>` : ""}
+          ${sysKey==="coc7" ? `<div class="sk defrow"><span>攻撃の種類</span>
+            <select data-i="${i}" data-f="freeKind" aria-label="自由記入枠の攻撃の種類">
+              <option value="melee"${c.freeKind!=="ranged"?" selected":""}>近接攻撃</option>
+              <option value="ranged"${c.freeKind==="ranged"?" selected":""}>飛び道具</option>
+            </select></div>` : ""}
+          ${sysKey==="coc7" ? `<label class="impale"><input type="checkbox" data-i="${i}" data-f="freeImpale"${c.freeImpale?" checked":""}>貫通武器として扱う（イクストリーム成功以上で貫通）</label>` : ""}
+          <p class="hint" style="margin:6px 0 0;font-size:11px">ダメージは記入した式にDBの設定を加えて計算します。${sysKey==="coc7"?"近接攻撃／飛び道具の別は、相手が応戦を選べるかどうかだけを決めます。":""}</p>
         </div>
       </div>
     </div>
@@ -557,7 +630,7 @@ function renderField(){
 }
 function refreshGauges(){
   for(let i=0;i<2;i++){
-    document.getElementById("gn"+i).textContent = PC[i].name || ("探索者"+(i?"B":"A"));
+    document.getElementById("gn"+i).textContent = PC[i].name || ("キャラクター"+(i?"B":"A"));
     document.getElementById("gh"+i).textContent = `HP ${PC[i].hp} / ${PC[i].hp}`;
     const bar=document.getElementById("gb"+i);
     bar.classList.remove("low"); bar.firstElementChild.style.width="100%";
@@ -568,10 +641,25 @@ function refreshGauges(){
 }
 field.addEventListener("input",e=>{
   const t=e.target, i=+t.dataset.i;
+  pristine=false;
   if(t.dataset.f){
     const f=t.dataset.f;
-    PC[i][f] = (f==="name"||f==="db"||f==="freeName") ? t.value : (parseInt(t.value,10)||0);
+    if(t.type==="checkbox"){
+      PC[i][f]=t.checked;
+      if(f==="freeDB" && t.checked) PC[i].freeHalfDB=false;
+      if(f==="freeHalfDB" && t.checked) PC[i].freeDB=false;
+      if(f==="freeDB"||f==="freeHalfDB") renderField();
+      return;
+    }
+    PC[i][f] = (f==="name"||f==="db"||f==="freeName"||f==="defMode"||f==="freeKind") ? t.value : (parseInt(t.value,10)||0);
+    if(f==="db"){
+      PC[i].dbSrc="";
+      t.classList.remove("dbcalc");
+      const note=t.closest(".body").querySelector(".dbnote");
+      if(note) note.remove();
+    }
     if(f==="name"||f==="hp") refreshGauges();
+
   }else if(t.dataset.sk){
     PC[i].skills[t.dataset.sk] = parseInt(t.value,10)||0;
     const row=t.closest(".sk"); row.classList.toggle("off", !PC[i].skills[t.dataset.sk]);
@@ -609,7 +697,7 @@ field.addEventListener("click",e=>{
   }
   const im=e.target.closest("[data-import]"), cl=e.target.closest("[data-clear]");
   if(im) openImport(+im.dataset.import);
-  if(cl){ const i=+cl.dataset.clear; PC[i]=blank(i?"探索者B":"探索者A", i?"#4E8FC7":"#C9A227"); renderField(); refreshGauges(); }
+  if(cl){ const i=+cl.dataset.clear; PC[i]=blank(i?"キャラクターB":"キャラクターA", i?"#4E8FC7":"#C9A227"); renderField(); refreshGauges(); }
 });
 
 document.addEventListener("click",e=>{
@@ -632,6 +720,11 @@ document.querySelectorAll(".sysbtn").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".sysbtn").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
   sysKey=b.dataset.sys;
   setNote(sys().note);
+  if(pristine){
+    PC[0] = sysKey==="coc7" ? sample7A() : sampleA();
+    PC[1] = sysKey==="coc7" ? sample7B() : sampleB();
+  }
+  renderField(); refreshGauges();
 }));
 setNote(SYS.coc6.note);
 
@@ -643,6 +736,14 @@ function openImport(i){ importTarget=i; setStatus(""); dlg.showModal(); }
 function setStatus(msg,cls){ const s=document.getElementById("dlgStatus"); s.textContent=msg||""; s.className="status "+(cls||""); }
 document.getElementById("dlgClose").onclick=()=>dlg.close();
 
+/** シート側に書かれたダメージボーナスか判定し、表記を整える */
+const DB_LABEL=/^(DB|ＤＢ|ダメージボーナス|ダメージ・?ボーナス|ダメボ|damagebonus|dmg_?bonus)$/i;
+function normDB(v){
+  const t=zen(String(v==null?"":v)).replace(/\s|　/g,"").replace(/[＋]/g,"+").replace(/[－ー−]/g,"-");
+  if(!/^[+-]?\d*d\d+$|^[+-]?\d+$/.test(t)) return null;
+  return t.replace(/^\+/,"") || "0";
+}
+
 /** キャラクター保管所の .js（JSON）を厳密に読む。戦闘系技能は固定順。 */
 const CS_BATTLE=["dodge","kick","grapple","punch","headbutt","throw","martial",
                  "handgun","smg","shotgun","machinegun","rifle"];
@@ -651,9 +752,9 @@ function fromCharasheetJson(o,c){
   const P = k => parseInt(o["NP"+k] || o["NA"+k] || 0,10) || 0;
   const str=P(1), con=P(2), dex=P(4), siz=P(6), hp=P(9);
   if(hp) c.hp=hp; if(con) c.con=con; if(dex) c.dex=dex;
-  const db = String(o.dmg_bonus||"").trim();
-  if(/^[+-]?\d*[dD]\d+$|^[+-]?\d+$/.test(db)) c.db = db;
-  else if(str&&siz) c.db = sys().db(str,siz);
+  const db = normDB(o.dmg_bonus);
+  if(db!==null){ c.db = db; c.dbSrc="sheet"; }
+  else if(str&&siz){ c.db = sys().db(str,siz); c.dbSrc="calc"; }
   CS_BATTLE.forEach((k,i)=>{
     const v=parseInt(o.TBAP[i],10)||0;
     if(!v) return;
@@ -686,8 +787,8 @@ function fromCharasheetText(t,c){
   const hp=t.match(/(?:^|[\r\n])\s*HP[：:]\s*(\d+)/);
   if(hp){ c.hp=+hp[1]; n++; }
   const db=t.match(/ダメージボーナス[：:]\s*([+-]?\d*[dD]\d+|[+-]?\d+)/);
-  if(db){ c.db=db[1].replace(/D/g,"d"); n++; }
-  else if(str&&siz){ c.db=sys().db(str,siz); n++; }
+  if(db){ c.db=normDB(db[1])||c.db; c.dbSrc="sheet"; n++; }
+  else if(str&&siz){ c.db=sys().db(str,siz); c.dbSrc="calc"; n++; }
   const re=/《([^》]{1,30})》[\s　]*(\d{1,3})\s*[%％]/g;
   let m;
   while((m=re.exec(t))!==null){
@@ -728,20 +829,21 @@ function importData(raw,i){
   const c = blank(PC[i].name, PC[i].color);
   c.img = PC[i].img;
   c.freeName = PC[i].freeName; c.wpn.free = PC[i].wpn.free; c.skills.free = PC[i].skills.free;
+  c.defMode = PC[i].defMode; c.freeImpale = PC[i].freeImpale; c.freeKind = PC[i].freeKind; c.freeDB = PC[i].freeDB; c.freeHalfDB = PC[i].freeHalfDB;
   let found=0, obj=null;
   try{ obj = JSON.parse(raw.trim().replace(/^[^[{]*/,"").replace(/;\s*$/,"")); }catch(e){ obj=null; }
 
   /* --- 0. キャラクター保管所 .js（固定フォーマット） --- */
   if(obj && Array.isArray(obj.TBAP)){
     found += fromCharasheetJson(obj,c);
-    ATK.filter(a=>a.wpn).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+    atks().filter(a=>a.wpn!==undefined).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
     return c;
   }
   /* --- 0b. キャラクター保管所 テキスト出力 --- */
   if(!obj && /《[^》]*》[\s　]*\d{1,3}\s*[%％]/.test(raw)){
     found += fromCharasheetText(raw,c);
     if(found){
-      ATK.filter(a=>a.wpn).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+      atks().filter(a=>a.wpn!==undefined).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
       return c;
     }
   }
@@ -755,10 +857,20 @@ function importData(raw,i){
       const l=String(s.label||"").toUpperCase();
       if(l==="HP"||l==="耐久力") c.hp = +(s.max||s.value)||c.hp;
     });
-    const P={};
-    (dat.params||[]).forEach(p=>{P[String(p.label||"").toUpperCase()] = parseInt(p.value,10)||0;});
+    const P={}; let dbRaw=null;
+    (dat.params||[]).forEach(p=>{
+      const label=String(p.label||"").replace(/\s|　/g,"");
+      if(DB_LABEL.test(label)){ dbRaw = normDB(p.value); return; }
+      P[label.toUpperCase()] = parseInt(p.value,10)||0;
+    });
+    (dat.status||[]).forEach(st=>{
+      const label=String(st.label||"").replace(/\s|　/g,"");
+      if(dbRaw===null && DB_LABEL.test(label)) dbRaw = normDB(st.value);
+    });
     if(P.CON) c.con=P.CON; if(P.DEX) c.dex=P.DEX;
-    if(P.STR&&P.SIZ) c.db = sys().db(P.STR,P.SIZ);
+    /* シートにダメージボーナスが入っていればそれを採用。無ければ STR+SIZ から算出 */
+    if(dbRaw!==null){ c.db = dbRaw; c.dbSrc="sheet"; }
+    else if(P.STR&&P.SIZ){ c.db = sys().db(P.STR,P.SIZ); c.dbSrc="calc"; }
     if(dat.commands) found += fromCommands(dat.commands,c);
     found += 2;
   }
@@ -798,8 +910,8 @@ function fromCommands(text,c){
       if(nm==="名前"||nm==="NAME") {/* 数値ではないので無視 */}
     }
   }
-  const dbm = s.match(/(?:ダメージボーナス|dmg_bonus|DB)["'\s:：=]*([+-]?\d*d\d+|[+-]\d+|0)(?![\d])/);
-  if(dbm && c.db==="0"){ c.db=dbm[1]; n++; }
+  const dbm = s.match(/(?:ダメージボーナス|ダメボ|dmg_bonus|DB)["'\s:：=＝]*([+-]?\d*[dD]\d+|[+-]\d+|0)(?![\d])/);
+  if(dbm){ const dbv=normDB(dbm[1]); if(dbv!==null){ c.db=dbv; c.dbFixed=true; c.dbSrc="sheet"; n++; } }
   const nm = s.match(/(?:名前|キャラクター名|PC名|name)\s*[:："']+\s*([^"'\n,、]{1,24})/);
   if(nm) c.name=nm[1].trim();
   return n;
@@ -836,8 +948,12 @@ function scanJson(root,c){
           else if(kk==="STR"||kk==="NSTR") STR=num;
           else if(kk==="SIZ"||kk==="NSIZ"||kk==="SIZE") SIZ=num;
         }
+        if(DB_LABEL.test(String(k).replace(/\s|　/g,""))){
+          const dbv=normDB(v);
+          if(dbv!==null){ c.db=dbv; c.dbFixed=true; c.dbSrc="sheet"; n++; }
+        }
         if(typeof v==="string" && (k==="pc_name"||k==="name"||k==="characterName") && v.trim() && !matchSkill(v)) {
-          if(c.name==="探索者A"||c.name==="探索者B"||!c.name) c.name=v.trim();
+          if(c.name==="キャラクターA"||c.name==="キャラクターB"||!c.name) c.name=v.trim();
         }
         if(typeof v==="string" && /CCB?\s*<=/.test(v)) n+=fromCommands(v,c);
         if(v && typeof v==="object") walk(v,k);
@@ -881,9 +997,9 @@ function scanJson(root,c){
     }
   })(root);
 
-  if(STR&&SIZ&&c.db==="0"){ c.db=sys().db(STR,SIZ); n++; }
+  if(STR&&SIZ&&c.db==="0"&&!c.dbFixed){ c.db=sys().db(STR,SIZ); c.dbSrc="calc"; n++; }
   /* 武器ダメージの既定値を補完（技能があるのに武器未入力なら標準値を入れる） */
-  ATK.filter(a=>a.wpn).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+  atks().filter(a=>a.wpn!==undefined).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
   return n;
 }
 document.getElementById("dlgParse").onclick=()=>{
@@ -891,7 +1007,7 @@ document.getElementById("dlgParse").onclick=()=>{
   if(!raw.trim()) return setStatus("データが空です。シートの出力を貼り付けてください。","ng");
   const c=importData(raw,importTarget);
   if(!c) return setStatus("読み取れる項目が見つかりませんでした。別の出力形式（ココフォリア出力が最も確実です）をお試しください。","ng");
-  PC[importTarget]=c; renderField(); refreshGauges();
+  PC[importTarget]=c; pristine=false; renderField(); refreshGauges();
   const got=Object.values(c.skills).filter(v=>v>0).length;
   setStatus(`「${c.name}」を反映しました（戦闘技能 ${got} 件 / HP ${c.hp} / CON ${c.con} / DEX ${c.dex} / DB ${c.db}）。数値をご確認ください。`,"ok");
 };
@@ -965,7 +1081,7 @@ function rollTag(res){
 
 /** 使用可能な攻撃の一覧 */
 function options(c){
-  const list=ATK.concat(c.skills.free>0 ? [freeAtk(c)] : []);
+  const list=atks().concat(c.skills.free>0 ? [freeAtk(c)] : []);
   return list.filter(a=>{
     if(!(c.skills[a.k]>0)) return false;
     if(a.wpn!==undefined && !parseExpr(c.wpn[a.k]).length) return false;
@@ -1081,34 +1197,176 @@ async function turn(atk,def,ai,di,state){
   fx(fd,"hitshake",340); popup(di,"-"+dmg);
   const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
 
-  def.cur -= dmg;
-  setHP(di, def.cur, def.max);
-  await sleep(420);
+  await applyDamage(def,di,dmg,state,A);
+  await sleep(380);
+}
 
+/** ダメージ適用・ノックアウト判定・ショックロール（6版／7版 共通） */
+async function applyDamage(v,vi,dmg,state,srcName){
+  v.cur -= dmg;
+  setHP(vi, v.cur, v.max);
+  await sleep(420);
+  const D=v.name, A=srcName;
   /* --- HP2以下で即ノックアウト --- */
-  if(def.cur<=2){
+  if(v.cur<=2){
     put("l-kill", fill(pick(F_LOW),D,A));
-    put("l-sys", `${D}のHPは${Math.max(0,def.cur)}。行動不能——ノックアウト！`);
-    state.ko=di; return;
+    put("l-sys", `${D}のHPは${Math.max(0,v.cur)}。行動不能——ノックアウト！`);
+    state.ko=vi; return true;
   }
   /* --- ショックロール（現在HPが最大の半分以下になったとき1回） --- */
-  if(!def.shocked && def.cur <= Math.floor(def.max/2)){
-    def.shocked=true;
-    const t=sys().shock(def), sr=skillRoll(t);
+  if(!v.shocked && v.cur <= Math.floor(v.max/2)){
+    v.shocked=true;
+    const t=sys().shock(v), sr = sysKey==="coc7" ? roll7(t) : skillRoll(t);
     put("l-sys", `${D}のHPが半分を割った——ショックロール発生！`);
     await sleep(240);
-    await showDice(sr.r, di);
-    put("l-roll", `${sys().cmd}${t}（${sys().shockLabel(def)}） ⇒ ${sr.r} ${sr.ok?'<b class="s">成功！</b>':'<b class="f">失敗！</b>'}`);
+    await showDice(sr.r, vi);
+    put("l-roll", `${sys().cmd}${t}（${sys().shockLabel(v)}） ⇒ ${sr.r} ${sr.ok?'<b class="s">成功！</b>':'<b class="f">失敗！</b>'}`);
     await sleep(240);
     put("l-flav", fill(pick(sr.ok?F_SHOCK_OK:F_SHOCK_NG),D,A));
-    if(!sr.ok){ put("l-sys", `${D}は気絶した——ノックアウト！`); state.ko=di; return; }
+    if(!sr.ok){ put("l-sys", `${D}は気絶した——ノックアウト！`); state.ko=vi; return true; }
   }
-  await sleep(380);
+  return false;
+}
+
+/* ============================================================
+   7版：成功度の対抗による戦闘
+   ============================================================ */
+const LV7={"4":"クリティカル！","3":"イクストリーム成功！","2":"ハード成功！","1":"レギュラー成功！","0":"失敗！","-1":"ファンブル！"};
+/** CC<=target を1d100で判定し、成功度を返す */
+function roll7(target){
+  const r=d(100), t=Math.max(0,target|0);
+  let lv;
+  if(r===1) lv=4;
+  else if(t<50 ? r>=96 : r===100) lv=-1;
+  else if(r<=Math.floor(t/5)) lv=3;
+  else if(r<=Math.floor(t/2)) lv=2;
+  else if(r<=t) lv=1;
+  else lv=0;
+  return {r:r, lv:lv, name:LV7[String(lv)], ok:lv>=1, crit:lv===4, fum:lv===-1};
+}
+function tag7(x){
+  const cls = x.lv>=3 ? "c" : (x.lv>=1 ? "s" : "f");
+  return `<b class="${cls}">${x.name}</b>`;
+}
+/** 7版のダメージ算出（lv>=3 で最大値／貫通） */
+function dmg7calc(ch,a,lv){
+  const base  = a.wpn!==undefined ? parseExpr(ch.wpn[a.k]) : parseExpr(a.dice);
+  const half  = a.db==="half";
+  const useDB = a.db==="full" || half;
+  const dbT   = useDB ? parseExpr(ch.db) : [];
+  const hasDB = useDB && ch.db && ch.db!=="0";
+  const dbLab = hasDB ? (half ? "＋［"+exprLabel(dbT)+"÷2］" : "+"+exprLabel(dbT)) : "";
+  /* DBの値（イクストリーム以上は最大値、1/2指定なら切り捨てで半減） */
+  let dbSum=0, dbr={total:0,parts:[]};
+  if(hasDB){
+    if(lv>=3){ dbSum = maxOf(dbT); }
+    else { dbr = rollTerms(dbT); dbSum = dbr.total; }
+    if(half) dbSum = Math.floor(Math.abs(dbSum)/2) * (dbSum<0?-1:1);
+  }
+  const dbDetail = !hasDB ? null
+    : (half ? {total:dbSum, parts:[{label:"DB÷2", rolls:null, sum:dbSum}]} : dbr);
+  let dmg, label, detail;
+  if(lv>=3 && a.impale){
+    const extra=rollTerms(base);
+    dmg = maxOf(base) + extra.total + dbSum;
+    label = `［貫通］${exprLabel(base)}最大＋${exprLabel(base)}${dbLab}`;
+    detail = `最大${maxOf(base)} / ${fmtParts(extra,dbDetail)}`;
+  }else if(lv>=3){
+    dmg = maxOf(base) + dbSum;
+    label = exprLabel(base)+dbLab;
+    detail = half&&hasDB ? `最大値 / DB÷2:${dbSum}` : "最大値";
+  }else{
+    const b=rollTerms(base);
+    dmg = b.total + dbSum;
+    label = exprLabel(base)+dbLab;
+    detail = fmtParts(b, dbDetail);
+  }
+  return {dmg:Math.max(1,dmg), label:label, detail:detail};
+}
+/** 防御時の対応はキャラクターごと。戦闘中でも常に最新の設定を読む */
+function defModeOf(i){ return (PC[i] && PC[i].defMode==="fight") ? "fight" : "dodge"; }
+async function turn7(atk,def,ai,di,state){
+  const A=atk.name, D=def.name;
+  put("l-turn", `${A}のターン！`);
+  await sleep(320);
+  const a=chooseAttack(atk);
+  if(!a){
+    put("l-flav", `${A}には振るえる戦闘技能がない。ただ身構えるだけだ……`);
+    await sleep(500); return;
+  }
+  const sk=atk.skills[a.k];
+  const melee=!!a.melee;
+  const useFight = melee && defModeOf(di)==="fight";
+
+  /* --- 攻撃側のロール --- */
+  put("l-roll", `${A}の${a.n}！　CC<=${sk} ⇒ <span>?</span>`);
+  const line=logEl.lastElementChild;
+  const ra=roll7(sk);
+  await showDice(ra.r, ai);
+  line.innerHTML = `${A}の${a.n}！　CC<=${sk} ⇒ ${ra.r} ${tag7(ra)}`;
+  await sleep(200);
+  put("l-flav", fill(pick(ra.ok ? (FLAV[a.k]||F_FREE) : (ra.fum?F_FUMBLE:F_MISS)),A,D).replace(/\{S\}/g,a.n));
+  const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
+  fx(fa, ai===0?"lungeR":"lungeL", 420);
+
+  /* --- 攻撃が失敗し、防御側が「回避」なら回避ロールは行わない --- */
+  if(!ra.ok && !useFight){
+    put("l-sys", `攻撃が届いていないため、${D}は回避を振らない。`);
+    await sleep(560); return;
+  }
+
+  /* --- 防御側のロール --- */
+  await sleep(300);
+  const dsk = useFight ? (def.skills.fight||0) : (def.dodge||0);
+  const dnm = useFight ? "応戦・近接戦闘（格闘）" : (melee ? "回避" : "回避・身を隠す");
+  const rd=roll7(dsk);
+  await showDice(rd.r, di);
+  put("l-roll", `${D}の${dnm}！　CC<=${dsk} ⇒ ${rd.r} ${tag7(rd)}`);
+  await sleep(260);
+
+  /* 回避：同値なら防御側の勝ち／応戦：同値なら攻撃側の勝ち、反撃は1段階上の成功度が必要 */
+  const hit     = ra.ok && (useFight ? ra.lv >= rd.lv : ra.lv > rd.lv);
+  const counter = useFight && rd.ok && rd.lv > ra.lv;
+
+  if(hit){
+    put("l-flav", fill(pick(F_DODGE_NG),A,D));
+    if(ra.lv>=3) put("l-sys", a.impale ? `深々と突き刺さった——貫通！` : `会心の一撃——ダメージは最大値！`);
+    const r=dmg7calc(atk,a,ra.lv);
+    await sleep(280);
+    put("l-roll", `${r.label} ⇒ ${r.dmg}${r.detail?`　<span style="color:#5B677C">（${r.detail}）</span>`:""}`);
+    put("l-dmg", `${r.dmg}のダメージ！`);
+    fx(fd,"hitshake",340); popup(di,"-"+r.dmg);
+    const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
+    await applyDamage(def,di,r.dmg,state,A);
+  }else if(counter){
+    put("l-flav", fill(pick(F_COUNTER),A,D));
+    fx(fd, di===0?"lungeR":"lungeL", 420);
+    const cd=ATK7[0];
+    const r=dmg7calc(def,cd,rd.lv);
+    if(rd.lv>=3) put("l-sys", `会心の反撃——ダメージは最大値！`);
+    await sleep(280);
+    put("l-roll", `${r.label} ⇒ ${r.dmg}${r.detail?`　<span style="color:#5B677C">（${r.detail}）</span>`:""}`);
+    put("l-dmg", `${D}の反撃、${r.dmg}のダメージ！`);
+    fx(fa,"hitshake",340); popup(ai,"-"+r.dmg);
+    await applyDamage(atk,ai,r.dmg,state,D);
+  }else if(ra.ok || rd.ok){
+    put("l-flav", fill(pick(useFight?F_PARRY:F_DODGE_OK),A,D));
+    if(useFight && rd.ok) put("l-sys", `${D}の応戦は${A}を上回れなかった——反撃には至らない。`);
+    fx(fd, di===0?"dodgeL":"dodgeR", 420);
+    popup(di,"MISS","miss");
+  }else{
+    put("l-flav", fill(pick(F_BOTHFAIL),A,D));
+  }
+  await sleep(420);
 }
 function fmtParts(b,db){
   const seg=[];
   (b.parts||[]).forEach(p=>{ if(p.rolls) seg.push(p.label+":"+p.rolls.join("+")); });
-  if(db){ (db.parts||[]).forEach(p=>{ seg.push(p.rolls?p.label+":"+p.rolls.join("+"):"DB"+(p.sum>=0?"+":"")+p.sum); }); }
+  if(db){ (db.parts||[]).forEach(p=>{
+    if(p.rolls) seg.push(p.label+":"+p.rolls.join("+"));
+    else if(/^DB/.test(p.label||"")) seg.push(p.label+":"+p.sum);
+    else seg.push("DB"+(p.sum>=0?"+":"")+p.sum);
+  }); }
   return seg.join(" / ");
 }
 
@@ -1121,13 +1379,14 @@ async function battle(){
   const F=[0,1].map(i=>{
     const c=JSON.parse(JSON.stringify(PC[i]));
     c.max=Math.max(1,c.hp); c.cur=c.max; c.shocked=false; c.skipTurn=false; c.idx=i;
-    if(!c.name) c.name = i?"探索者B":"探索者A";
+    if(!c.name) c.name = i?"キャラクターB":"キャラクターA";
     return c;
   });
   [0,1].forEach(i=>{document.getElementById("f"+i).classList.remove("ko"); setHP(i,F[i].cur,F[i].max);});
 
   put("l-sys", `システム：${sys().name}`);
   put("l-sys", `${F[0].name}（HP${F[0].max} / DEX${F[0].dex} / DB${F[0].db}）　対　${F[1].name}（HP${F[1].max} / DEX${F[1].dex} / DB${F[1].db}）`);
+  if(sysKey==="coc7") put("l-sys", `近接戦闘を受けた時の対応：${F[0].name}＝${defModeOf(0)==="fight"?"応戦":"回避"} ／ ${F[1].name}＝${defModeOf(1)==="fight"?"応戦":"回避"}（戦闘中に変更できます）`);
   await sleep(500);
 
   /* --- 先攻決定 --- */
@@ -1152,10 +1411,11 @@ async function battle(){
     const rf=document.getElementById("rflash");
     if(SPEED!==0){ rf.textContent="ROUND "+round; rf.classList.remove("go"); void rf.offsetWidth; rf.classList.add("go"); }
     await sleep(700);
+    const T = sysKey==="coc7" ? turn7 : turn;
     for(const ai of order){
       if(state.ko>=0||abort) break;
       const di = ai===0?1:0;
-      await turn(F[ai],F[di],ai,di,state);
+      await T(F[ai],F[di],ai,di,state);
     }
   }
 
@@ -1200,11 +1460,11 @@ document.getElementById("copylog").onclick=()=>{
 renderField(); refreshGauges();
 put("l-sys","システム：クトゥルフ神話TRPG（6版）");
 put("l-round","■□■　ROUND 1　■□■");
-put("l-turn","探索者Aのターン！");
-put("l-roll",'探索者Aのキック！　CCB<=70 ⇒ 63 <b class="s">成功！</b>');
-put("l-flav","鋭いキックを探索者Bに叩き込む！");
-put("l-roll",'探索者Bの回避！　CCB<=58 ⇒ 67 <b class="f">失敗！</b>');
-put("l-flav","探索者Bは躱そうとするが避けきれない！");
+put("l-turn","キャラクターAのターン！");
+put("l-roll",'キャラクターAのキック！　CCB<=70 ⇒ 63 <b class="s">成功！</b>');
+put("l-flav","鋭いキックをキャラクターBに叩き込む！");
+put("l-roll",'キャラクターBの回避！　CCB<=58 ⇒ 67 <b class="f">失敗！</b>');
+put("l-flav","キャラクターBは躱そうとするが避けきれない！");
 put("l-roll",'1d6+1d4 ⇒ 5　<span style="color:#5B677C">（1d6:3 / 1d4:2）</span>');
 put("l-dmg","5のダメージ！");
 put("l-sys","　");

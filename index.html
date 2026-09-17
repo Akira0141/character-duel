@@ -18,12 +18,15 @@
   --phos:#C9A227;
   --azure:#4E8FC7;
   --shadow:0 18px 40px -22px #000;
+  --ah:310px; --fw:152px; --fh:212px; --fin:24%; --sw:100px; --sh:166px;
   --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
   --disp:"Shippori Mincho B1",serif;
   --ui:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+body.bigart{--ah:520px; --fw:200px; --fh:424px; --fin:20%; --sw:132px; --sh:224px;}
+.arena,.fighter,.fighter img,.fighter svg{transition:height .25s ease,width .25s ease,max-height .25s ease,max-width .25s ease}
 [hidden]{display:none!important}
 img{max-width:100%}
 body{
@@ -70,15 +73,15 @@ header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 24px;borde
 .arena{
   position:relative;margin:26px 0 0;border:1px solid var(--line);background:
    linear-gradient(180deg,#0B111C 0%,#121C2C 60%,#070A11 100%);
-  height:230px;overflow:hidden;box-shadow:var(--shadow);
+  height:var(--ah);overflow:hidden;box-shadow:var(--shadow);
 }
 .arena::after{content:"";position:absolute;inset:auto 0 0 0;height:54px;z-index:1;
   background:linear-gradient(180deg,transparent,rgba(78,143,199,.12));border-top:1px solid #1D283A}
-.fighter{position:absolute;z-index:2;bottom:8px;width:108px;height:138px;display:flex;align-items:flex-end;justify-content:center;transition:transform .22s cubic-bezier(.3,1.5,.5,1)}
-.fighter.L{left:26%}
-.fighter.R{right:26%}
-.fighter img{max-height:138px;max-width:108px;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
-.fighter svg{width:84px;height:132px}
+.fighter{position:absolute;z-index:2;bottom:10px;width:var(--fw);height:var(--fh);display:flex;align-items:flex-end;justify-content:center;transition:transform .22s cubic-bezier(.3,1.5,.5,1)}
+.fighter.L{left:var(--fin)}
+.fighter.R{right:var(--fin)}
+.fighter img{max-height:var(--fh);max-width:var(--fw);object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
+.fighter svg{width:var(--sw);height:var(--sh)}
 .lungeR{transform:translateX(62px) rotate(-4deg)}
 .lungeL{transform:translateX(-62px) rotate(4deg)}
 .hitshake{animation:shake .32s linear}
@@ -241,8 +244,10 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 @media (max-width:860px){
   .field{grid-template-columns:1fr;gap:14px}
   .vs{padding:0;font-size:22px}
-  .arena{height:190px}
-  .fighter{bottom:6px;width:76px;height:104px}.fighter img{max-height:104px;max-width:76px}.fighter svg{width:62px;height:100px}
+  :root{--ah:236px; --fw:104px; --fh:150px; --fin:19%; --sw:72px; --sh:118px;}
+  body.bigart{--ah:400px; --fw:140px; --fh:300px; --fin:6%; --sw:96px; --sh:160px;}
+  .fighter{bottom:6px}
+  .die{width:36px;height:36px;font-size:13px}.dieres{font-size:20px}
 }
 </style>
 
@@ -275,6 +280,10 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 <div class="controls">
   <button class="primary" id="start">開 戦</button>
   <button class="ghost" id="reset">リセット</button>
+  <div class="speed" role="group" aria-label="立ち絵のサイズ">
+    <button class="ghost" data-art="normal" aria-pressed="true">立ち絵 標準</button>
+    <button class="ghost" data-art="big" aria-pressed="false">特大</button>
+  </div>
   <div class="speed" role="group" aria-label="再生速度">
     <button class="ghost" data-spd="1" aria-pressed="true">等速</button>
     <button class="ghost" data-spd="0.4" aria-pressed="false">倍速</button>
@@ -1444,6 +1453,10 @@ document.getElementById("reset").onclick=()=>{
   [0,1].forEach(i=>document.getElementById("f"+i).classList.remove("ko"));
   refreshGauges();
 };
+document.querySelectorAll("[data-art]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-art]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  document.body.classList.toggle("bigart", b.dataset.art==="big");
+});
 document.querySelectorAll("[data-spd]").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("[data-spd]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
   SPEED=parseFloat(b.dataset.spd);

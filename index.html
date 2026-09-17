@@ -1,0 +1,1208 @@
+<title>探索者決闘場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ink:#05070C;
+  --ground:#080B12;
+  --panel:#101724;
+  --panel-2:#16202F;
+  --line:#263449;
+  --parch:#E3E8F1;
+  --parch-dim:#97A3B6;
+  --blood:#B4342A;
+  --blood-soft:#D9584B;
+  --phos:#C9A227;
+  --azure:#4E8FC7;
+  --shadow:0 18px 40px -22px #000;
+  --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  --disp:"Shippori Mincho B1",serif;
+  --ui:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--parch);font-family:var(--ui);
+  font-size:15px;line-height:1.7;
+  background-image:radial-gradient(1200px 600px at 50% -10%,#12203A 0%,transparent 70%);
+}
+a{color:var(--phos)}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+
+/* ---------- header ---------- */
+header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 24px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.mast h1{
+  font-family:var(--disp);font-weight:800;font-size:clamp(30px,5vw,46px);
+  margin:0;letter-spacing:.14em;text-wrap:balance;
+  text-shadow:0 0 28px rgba(180,52,42,.28);
+}
+.mast h1 .sep{color:var(--blood)}
+.mast p{margin:0;color:var(--parch-dim);font-size:13.5px;max-width:52ch}
+
+/* ---------- system picker ---------- */
+.systems{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
+.sysbtn{
+  font-family:var(--ui);font-size:13.5px;font-weight:500;color:var(--parch-dim);
+  background:var(--panel);border:1px solid var(--line);border-radius:2px;
+  padding:9px 16px;cursor:pointer;transition:.18s;letter-spacing:.04em;
+}
+.sysbtn:hover{color:var(--parch);border-color:var(--azure)}
+.sysbtn[aria-pressed="true"]{color:var(--ink);background:var(--phos);border-color:var(--phos);font-weight:700}
+.sysbtn[disabled]{opacity:.42;cursor:not-allowed}
+.sysnote{font-size:12.5px;color:var(--parch-dim);margin:10px 0 0;border:1px solid var(--line);
+  border-radius:2px;background:var(--panel);max-width:74ch}
+.sysnote b{color:var(--phos);font-weight:700}
+.sysnote>summary{list-style:none;cursor:pointer;padding:8px 12px;display:flex;align-items:center;gap:8px;
+  font-size:12.5px;letter-spacing:.06em;color:var(--parch);user-select:none}
+.sysnote>summary::-webkit-details-marker{display:none}
+.sysnote>summary::before{content:"▼";color:var(--phos);font-size:10px;display:inline-block;transition:transform .18s}
+.sysnote:not([open])>summary::before{transform:rotate(-90deg)}
+.sysnote>summary:hover{color:var(--phos)}
+.sysnote[open]>summary{border-bottom:1px solid var(--line)}
+.sysbody{padding:10px 12px 12px;line-height:1.85}
+
+/* ---------- arena ---------- */
+.arena{
+  position:relative;margin:26px 0 0;border:1px solid var(--line);background:
+   linear-gradient(180deg,#0B111C 0%,#121C2C 60%,#070A11 100%);
+  height:230px;overflow:hidden;box-shadow:var(--shadow);
+}
+.arena::after{content:"";position:absolute;inset:auto 0 0 0;height:54px;z-index:1;
+  background:linear-gradient(180deg,transparent,rgba(78,143,199,.12));border-top:1px solid #1D283A}
+.fighter{position:absolute;z-index:2;bottom:8px;width:108px;height:138px;display:flex;align-items:flex-end;justify-content:center;transition:transform .22s cubic-bezier(.3,1.5,.5,1)}
+.fighter.L{left:26%}
+.fighter.R{right:26%}
+.fighter img{max-height:138px;max-width:108px;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
+.fighter svg{width:84px;height:132px}
+.fighter.R>*{transform:scaleX(-1)}
+.lungeR{transform:translateX(62px) rotate(-4deg)}
+.lungeL{transform:translateX(-62px) rotate(4deg)}
+.hitshake{animation:shake .32s linear}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-9px,3px)}40%{transform:translate(8px,-3px)}60%{transform:translate(-6px,2px)}80%{transform:translate(5px,0)}}
+.dodgeL{transform:translateX(-34px) skewX(8deg);opacity:.7}
+.dodgeR{transform:translateX(34px) skewX(-8deg);opacity:.7}
+.ko{transform:rotate(78deg) translateY(30px);opacity:.55;transition:transform .8s ease-in,opacity .8s}
+.popup{position:absolute;font-family:var(--disp);font-weight:800;font-size:34px;color:var(--blood-soft);
+  text-shadow:0 2px 12px #000;pointer-events:none;animation:pop 1s ease-out forwards}
+.popup.miss{color:var(--azure);font-size:22px}
+@keyframes pop{0%{opacity:0;transform:translateY(10px) scale(.7)}25%{opacity:1;transform:translateY(-8px) scale(1.1)}100%{opacity:0;transform:translateY(-52px) scale(1)}}
+.dicebox{position:absolute;top:62%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;
+  align-items:center;opacity:0;transition:opacity .18s;pointer-events:none;z-index:5}
+.dicerow{display:flex;gap:9px}
+.dicebox.L{left:4%}.dicebox.R{right:4%}
+.dicebox.on{opacity:1}
+.die{width:44px;height:44px;background:linear-gradient(160deg,#EFE8D4,#BFB69C);color:#141A16;
+  clip-path:polygon(50% 0%,100% 34%,78% 100%,22% 100%,0% 34%);
+  display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:15px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.65));font-variant-numeric:tabular-nums}
+.die.tumble{animation:tumble .12s linear infinite}
+@keyframes tumble{0%{transform:rotate(-9deg) translateY(-3px)}50%{transform:rotate(8deg) translateY(3px)}100%{transform:rotate(-9deg) translateY(-3px)}}
+.die.tens{background:linear-gradient(160deg,#E4D6A8,#B9A26A)}
+.dieres{font-family:var(--disp);font-size:24px;font-weight:800;color:var(--phos);
+  text-shadow:0 2px 10px #000,0 0 14px rgba(0,0,0,.9);letter-spacing:.06em;
+  opacity:0;transition:opacity .15s;font-variant-numeric:tabular-nums}
+.dieres.on{opacity:1}
+.clash{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:var(--disp);
+  font-size:58px;color:var(--phos);opacity:0;pointer-events:none}
+.clash.go{animation:clash .5s ease-out}
+@keyframes clash{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}40%{opacity:.95;transform:translate(-50%,-50%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+.roundflash{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-size:44px;
+  letter-spacing:.3em;color:var(--parch);opacity:0;pointer-events:none}
+.roundflash.go{animation:rf 1.1s ease-out}
+@keyframes rf{0%{opacity:0;letter-spacing:.9em}30%{opacity:1;letter-spacing:.3em}100%{opacity:0;letter-spacing:.2em}}
+
+/* hp gauges over arena */
+.gauges{position:absolute;inset:12px 16px auto 16px;display:flex;gap:20px;justify-content:space-between;z-index:3}
+.gauge{width:min(38%,270px)}
+.gauge.R{text-align:right}
+.gauge .nm{font-family:var(--disp);font-size:16px;letter-spacing:.06em;display:block;margin-bottom:5px;
+  text-shadow:0 2px 6px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:9px;background:#070A11;border:1px solid var(--line);position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--blood),var(--blood-soft));transition:width .45s ease}
+.gauge.R .bar i{inset:0 0 0 auto}
+.bar.low i{background:linear-gradient(90deg,#6E2018,#B4342A)}
+.hpnum{font-family:var(--mono);font-size:12px;color:var(--parch-dim);font-variant-numeric:tabular-nums}
+
+/* ---------- controls ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0 0}
+button.primary{
+  font-family:var(--disp);font-size:19px;letter-spacing:.24em;font-weight:800;
+  background:var(--blood);color:#FFF3EA;border:0;padding:13px 40px 13px 46px;cursor:pointer;border-radius:2px;
+  box-shadow:0 10px 26px -14px var(--blood);transition:.16s;
+}
+button.primary:hover{background:var(--blood-soft);transform:translateY(-1px)}
+button.primary:disabled{background:#3A2320;color:#8B7A75;box-shadow:none;cursor:not-allowed;transform:none}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--parch-dim);padding:9px 16px;
+  font-size:13px;border-radius:2px;cursor:pointer;font-family:var(--ui)}
+button.ghost:hover{color:var(--parch);border-color:var(--azure)}
+button.ghost[aria-pressed="true"]{color:var(--phos);border-color:var(--phos)}
+.speed{display:flex;gap:0;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.speed button{border:0;border-left:1px solid var(--line);border-radius:0}
+.speed button:first-child{border-left:0}
+:focus-visible{outline:2px solid var(--phos);outline-offset:2px}
+
+/* ---------- character panels ---------- */
+.field{display:grid;grid-template-columns:1fr 64px 1fr;gap:18px;margin-top:34px;align-items:start}
+.vs{font-family:var(--disp);font-size:30px;color:var(--blood);text-align:center;padding-top:80px;letter-spacing:.05em}
+.card{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow)}
+.card>header{position:relative;display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.tagbtn{font-family:var(--mono);font-size:11px;padding:3px 9px;font-weight:600;border:1px solid rgba(255,255,255,.22);
+  border-radius:2px;cursor:pointer;line-height:1.5}
+.tagbtn:hover{filter:brightness(1.15)}
+.pal{position:absolute;top:calc(100% - 2px);left:10px;z-index:9;background:var(--panel-2);border:1px solid var(--line);
+  padding:8px;display:grid;grid-template-columns:repeat(8,20px);gap:5px;box-shadow:0 14px 30px -12px #000}
+.pal button{width:20px;height:20px;border:1px solid rgba(255,255,255,.18);border-radius:2px;cursor:pointer;padding:0}
+.pal button:hover{transform:scale(1.15)}
+.freewrap{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.sk.free input[data-f]{font-size:12.5px;text-align:left}
+.card>header .tag{font-family:var(--mono);font-size:11px;color:var(--ink);background:var(--phos);padding:2px 8px;font-weight:600}
+.card.b>header .tag{background:var(--azure);color:#04121E}
+.card>header input{flex:1;min-width:0}
+.body{padding:14px}
+label{display:block;font-size:11.5px;letter-spacing:.09em;color:var(--parch-dim);margin-bottom:4px}
+input[type=text],input[type=number],textarea,select{
+  width:100%;background:#070A11;border:1px solid var(--line);color:var(--parch);
+  font-family:var(--mono);font-size:14px;padding:7px 9px;border-radius:2px;
+}
+input:focus,textarea:focus{border-color:var(--azure);outline:none}
+.card>header input{font-family:var(--disp);font-size:17px;letter-spacing:.06em}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.row-io{display:flex;gap:8px;margin-bottom:12px}
+.row-io button{flex:1}
+.skills{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.skills h4{margin:0 0 9px;font-size:11.5px;letter-spacing:.12em;color:var(--parch-dim);font-weight:500}
+.sk{display:grid;grid-template-columns:1fr 62px 84px;gap:7px;align-items:center;margin-bottom:5px}
+.sk span{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk input{padding:4px 7px;font-size:13px;text-align:right}
+.sk input.wpn{text-align:center;font-size:12px}
+.sk.off span{color:#5B677C}
+.sk .ph{font-size:11px;color:#4B586E;text-align:center}
+.port{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.port .thumb{width:46px;height:60px;border:1px solid var(--line);background:#070A11;display:grid;place-items:center;overflow:hidden;flex:none}
+.port .thumb img{width:100%;height:100%;object-fit:contain}
+.port .thumb svg{width:30px;height:48px;color:#3A4A63}
+.port div{flex:1;min-width:0}
+.port input[type=file]{font-family:var(--ui);font-size:11px;color:var(--parch-dim);padding:5px}
+.port input[type=file]::file-selector-button{background:var(--panel-2);border:1px solid var(--line);color:var(--parch-dim);
+  font-family:var(--ui);font-size:11px;padding:4px 9px;border-radius:2px;margin-right:8px;cursor:pointer}
+
+/* ---------- import dialog ---------- */
+dialog{background:var(--panel);color:var(--parch);border:1px solid var(--line);max-width:620px;width:92vw;padding:0;box-shadow:0 30px 70px -20px #000}
+dialog::backdrop{background:rgba(4,7,5,.82)}
+dialog header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+dialog header h3{margin:0;font-family:var(--disp);font-size:18px;letter-spacing:.08em}
+dialog .body{padding:16px}
+dialog textarea{height:150px;font-size:12.5px;line-height:1.5;resize:vertical}
+.hint{font-size:12px;color:var(--parch-dim);line-height:1.75}
+.hint code{font-family:var(--mono);font-size:11.5px;color:var(--phos);background:#070A11;padding:1px 5px;border:1px solid var(--line)}
+.hint ul{padding-left:1.2em;margin:6px 0}
+.status{font-size:12.5px;margin-top:10px;min-height:1.5em}
+.status.ok{color:var(--azure)}
+.status.ng{color:var(--blood-soft)}
+
+/* ---------- log ---------- */
+.logwrap{margin-top:22px;border:1px solid var(--line);background:#070A11;box-shadow:var(--shadow)}
+.logwrap>header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel-2);font-size:12px;letter-spacing:.1em;color:var(--parch-dim)}
+#log{height:390px;overflow-y:auto;padding:16px 18px;font-size:14px}
+#log p{margin:0 0 2px}
+.l-round{font-family:var(--disp);font-weight:800;color:var(--phos);letter-spacing:.22em;margin:20px 0 8px!important;font-size:16px}
+.l-round:first-child{margin-top:0!important}
+.l-turn{font-family:var(--disp);font-size:15px;color:var(--parch);margin-top:12px!important;letter-spacing:.08em}
+.l-roll{font-family:var(--mono);font-size:13px;color:#93A6C0;font-variant-numeric:tabular-nums}
+.l-roll b.s{color:var(--azure)}
+.l-roll b.f{color:var(--blood-soft)}
+.l-roll b.c{color:var(--phos)}
+.l-flav{font-family:var(--disp);color:#CBD3E0;padding-left:.6em;border-left:2px solid #22314A;margin-left:1px!important}
+.l-dmg{font-family:var(--mono);font-size:14px;color:var(--blood-soft);font-weight:600}
+.l-sys{color:var(--parch-dim);font-size:12.5px;letter-spacing:.06em}
+.l-end{font-family:var(--disp);font-size:22px;color:var(--phos);letter-spacing:.2em;margin:18px 0 6px!important;text-align:center}
+.l-kill{font-family:var(--disp);color:var(--blood-soft);font-size:15px}
+.cursor::after{content:"▌";color:var(--phos);animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:#5B677C;font-size:11.5px;line-height:1.9}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media (max-width:860px){
+  .field{grid-template-columns:1fr;gap:14px}
+  .vs{padding:0;font-size:22px}
+  .arena{height:190px}
+  .fighter{bottom:6px;width:76px;height:104px}.fighter img{max-height:104px;max-width:76px}.fighter svg{width:62px;height:100px}
+}
+</style>
+
+<div class="wrap">
+<header class="mast">
+  <h1>探索者<span class="sep">×</span>決闘場</h1>
+  <p>同一システムのキャラコマデータを2つ入力するだけで、ステータスと戦闘技能だけを頼りに、決着がつくまで殴り合います。ダイスはすべて自動。あなたにできるのは見届けることだけ。</p>
+</header>
+
+<div class="systems" role="group" aria-label="システム選択">
+  <button class="sysbtn" data-sys="coc6" aria-pressed="true">クトゥルフ神話TRPG（6版）</button>
+  <button class="sysbtn" data-sys="coc7" aria-pressed="false" disabled>新クトゥルフ神話TRPG（7版・準備中）</button>
+  <button class="sysbtn" data-sys="emo" aria-pressed="false" disabled>エモクロア／ガイアケア（準備中）</button>
+</div>
+<details class="sysnote" id="sysnote"><summary>レギュレーション</summary><div class="sysbody"></div></details>
+
+<div class="arena" id="arena">
+  <div class="gauges">
+    <div class="gauge L"><span class="nm" id="gn0">探索者A</span><div class="bar" id="gb0"><i style="width:100%"></i></div><span class="hpnum" id="gh0">HP 13 / 13</span></div>
+    <div class="gauge R"><span class="nm" id="gn1">探索者B</span><div class="bar" id="gb1"><i style="width:100%"></i></div><span class="hpnum" id="gh1">HP 12 / 12</span></div>
+  </div>
+  <div class="fighter L" id="f0"></div>
+  <div class="fighter R" id="f1"></div>
+  <div class="dicebox L" id="dice0"><div class="dicerow"><span class="die tens">00</span><span class="die ones">0</span></div><span class="dieres"></span></div>
+  <div class="dicebox R" id="dice1"><div class="dicerow"><span class="die tens">00</span><span class="die ones">0</span></div><span class="dieres"></span></div>
+  <div class="clash" id="clash">✳</div>
+  <div class="roundflash" id="rflash"></div>
+</div>
+
+<div class="controls">
+  <button class="primary" id="start">開 戦</button>
+  <button class="ghost" id="reset">リセット</button>
+  <div class="speed" role="group" aria-label="再生速度">
+    <button class="ghost" data-spd="1" aria-pressed="true">等速</button>
+    <button class="ghost" data-spd="0.4" aria-pressed="false">倍速</button>
+    <button class="ghost" data-spd="0" aria-pressed="false">一瞬で</button>
+  </div>
+  <button class="ghost" id="copylog">ログをコピー</button>
+</div>
+
+<div class="logwrap">
+  <header><span>戦 闘 ロ グ</span><span id="logmeta">待機中</span></header>
+  <div id="log" aria-live="polite"></div>
+</div>
+
+<div class="field" id="field"></div>
+
+<footer class="foot">
+  ダイス判定・ダメージ算出はすべてこのページ内で完結します（サーバーへの送信はありません）。<br>
+  クトゥルフ神話TRPG／新クトゥルフ神話TRPGはArkham Horror LLC・株式会社KADOKAWAの著作物に基づく非公式のファンツールです。
+</footer>
+</div>
+
+<dialog id="dlg">
+  <header><h3>キャラクターシートを読み込む</h3><button class="ghost" id="dlgClose">閉じる</button></header>
+  <div class="body">
+    <label for="dlgText">キャラコマデータを貼り付け（ココフォリア駒データ／JSON／テキスト出力）</label>
+    <textarea id="dlgText" placeholder="ここにデータを貼り付けてください"></textarea>
+    <div class="row-io" style="margin-top:8px"><button class="ghost" id="dlgParse">解析してフォームに反映</button></div>
+    <p class="hint">
+      <b>データの出し方</b>
+      <ul>
+        <li><b>キャラクター保管所（charasheet）</b>…「データ出力」下の「テキスト」クリックで表示されるテキストをコピー＆ペースト</li>
+        <li><b>いあきゃら（iachara）</b>…「出力」⇒「ココフォリア駒出力」を選択後、ペースト</li>
+        <li><b>キャラエノ（charaeno）</b>…「ココフォリア コマ」⇒「コピー」を選択後、ペースト</li>
+      </ul>
+      反映後は念のため数値を目視で確認してください。書式の違いで拾い漏れた項目は手入力できます。
+    </p>
+    <div class="status" id="dlgStatus"></div>
+  </div>
+</dialog>
+
+<script>
+"use strict";
+/* ============================================================
+   探索者決闘場 — 自動戦闘エンジン
+   ============================================================ */
+
+/* ---------- dice ---------- */
+const d = n => Math.floor(Math.random()*n)+1;
+function zen(s){return String(s??"").replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/[ＤｄD]/g,"d");}
+function parseExpr(str){
+  const s = zen(str).replace(/\s/g,"").replace(/[＋]/g,"+").replace(/[－ー−]/g,"-");
+  const terms=[]; const re=/([+-]?)(\d*)d(\d+)|([+-]?)(\d+)/g; let m;
+  while((m=re.exec(s))!==null){
+    if(m[3]) terms.push({t:"d",sign:m[1]==="-"?-1:1,n:m[2]?+m[2]:1,f:+m[3]});
+    else if(m[5]!==undefined && m[5]!=="") terms.push({t:"c",sign:m[4]==="-"?-1:1,v:+m[5]});
+  }
+  return terms;
+}
+/** terms を振る。mul=ダイス個数倍率（マーシャルアーツ用）。 */
+function rollTerms(terms,mul){
+  mul = mul||1; let total=0; const parts=[];
+  for(const t of terms){
+    if(t.t==="d"){
+      const n=t.n*mul; let sum=0; const rs=[];
+      for(let i=0;i<n;i++){const v=d(t.f);rs.push(v);sum+=v;}
+      total += t.sign*sum;
+      parts.push({label:(t.sign<0?"-":"")+n+"d"+t.f, rolls:rs, sum:t.sign*sum});
+    }else{
+      total += t.sign*t.v;
+      parts.push({label:(t.sign<0?"-":"+")+t.v, rolls:null, sum:t.sign*t.v});
+    }
+  }
+  return {total,parts};
+}
+function exprLabel(terms,mul){
+  mul=mul||1;
+  return terms.map((t,i)=>{
+    const sg = t.sign<0?"-":(i?"+":"");
+    return sg + (t.t==="d" ? (t.n*mul)+"d"+t.f : t.v);
+  }).join("") || "0";
+}
+function maxOf(terms,mul){
+  mul=mul||1;
+  return terms.reduce((a,t)=>a + t.sign*(t.t==="d"?t.n*mul*t.f:t.v),0);
+}
+
+/* ---------- systems ---------- */
+const SYS = {
+  coc6:{
+    name:"クトゥルフ神話TRPG（6版）",
+    cmd:"CCB<=",
+    note:"<b>▼レギュレーション</b><br>判定は<b>CCB</b>。<br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br><b>1〜5でクリティカル</b>（回避不可・最大ダメージ）、<b>96〜100でファンブル</b>（次回攻撃不可）。<br>武道はマーシャルアーツと同じ扱い（dbを省くダメージ2倍）、素手技能と組み合わせロール。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は抽選。<br>銃火器は1R1発。",
+    shock:c=>c.con*5, shockLabel:c=>"CON×5="+(c.con*5),
+    db:(str,siz)=>{const t=str+siz;
+      if(t<=12)return"-1d6"; if(t<=16)return"-1d4"; if(t<=24)return"0";
+      if(t<=32)return"1d4"; if(t<=40)return"1d6";
+      return (Math.floor((t-41)/16)+2)+"d6";}
+  },
+  coc7:{
+    name:"新クトゥルフ神話TRPG（7版）",
+    cmd:"CCB<=",
+    note:"ショックロールは <b>CON</b> 目標（7版の重傷ルール準拠）。ダメージボーナスは STR+SIZ から7版表で自動算出。判定は 1d100、<b>1でクリティカル</b>、<b>100（技能50未満は96〜100）でファンブル</b>。",
+    shock:c=>c.con, shockLabel:c=>"CON="+c.con,
+    db:(str,siz)=>{const t=str+siz;
+      if(t<=64)return"-2"; if(t<=84)return"-1"; if(t<=124)return"0";
+      if(t<=164)return"1d4"; if(t<=204)return"1d6";
+      return (Math.floor((t-205)/80)+2)+"d6";}
+  }
+};
+let sysKey="coc6";
+const sys = ()=>SYS[sysKey];
+
+/* ---------- attacks ---------- */
+const ATK = [
+  {k:"kick",     n:"キック",           dice:"1d6",  db:"full", ma:true},
+  {k:"grapple",  n:"組み付き",         dice:"1d6",  db:"full", ma:true},
+  {k:"punch",    n:"こぶし（パンチ）", dice:"1d3",  db:"full", ma:true},
+  {k:"headbutt", n:"頭突き",           dice:"1d4",  db:"full", ma:true},
+  {k:"throw",    n:"投擲",             wpn:"1d6",   db:"half"},
+  {k:"handgun",  n:"拳銃",             wpn:"1d10",  db:"none"},
+  {k:"smg",      n:"サブマシンガン",   wpn:"1d10",  db:"none"},
+  {k:"shotgun",  n:"ショットガン",     wpn:"4d6",   db:"none"},
+  {k:"machinegun",n:"マシンガン",      wpn:"2d6+3", db:"none"},
+  {k:"rifle",    n:"ライフル",         wpn:"2d6+4", db:"none"},
+  {k:"katana",   n:"日本刀",           dice:"1d10", db:"full"},
+  {k:"knife",    n:"ナイフ",           wpn:"1d4",   db:"full"}
+];
+const MA = [{k:"martial",n:"マーシャルアーツ"},{k:"budo",n:"武道"}];
+
+/* 技能名の表記ゆれ → キー */
+const ALIAS = {
+  kick:["キック","蹴り"],
+  grapple:["組み付き","組みつき","組付き","くみつき"],
+  punch:["こぶし","拳","パンチ","こぶし(パンチ)","こぶし（パンチ）","近接戦闘(格闘)","近接戦闘（格闘）","格闘"],
+  headbutt:["頭突き","頭突","ヘッドバット"],
+  throw:["投擲","投てき"],
+  martial:["マーシャルアーツ","マーシャル・アーツ"],
+  budo:["武道","武術"],
+  handgun:["拳銃","ハンドガン","けん銃"],
+  smg:["サブマシンガン","短機関銃","SMG","サブマシンガン(SMG)"],
+  shotgun:["ショットガン","散弾銃"],
+  machinegun:["マシンガン","機関銃"],
+  rifle:["ライフル","ライフル/ショットガン","小銃"],
+  katana:["日本刀","刀","近接戦闘(刀)","近接戦闘（刀）"],
+  knife:["ナイフ","短刀","ダガー"],
+  dodge:["回避","かいひ"]
+};
+function matchSkill(raw){
+  if(!raw) return null;
+  let s = String(raw).replace(/\s|　/g,"").replace(/[（）]/g,m=>m==="（"?"(":")").replace(/【|】|\[|\]/g,"");
+  s = s.replace(/^(戦闘|射撃)技能?[:：]?/,"");
+  for(const key in ALIAS){
+    for(const a of ALIAS[key]){
+      const an=a.replace(/\s/g,"");
+      if(s===an) return key;
+    }
+  }
+  for(const key in ALIAS){
+    for(const a of ALIAS[key]){
+      const an=a.replace(/\s/g,"");
+      if(an.length>=2 && s.indexOf(an)===0) return key;
+    }
+  }
+  return null;
+}
+
+/* ---------- character model ---------- */
+function blank(name,color){
+  const c={name:name,hp:10,con:10,dex:10,db:"0",dodge:30,img:null,color:color||"#C9A227",
+           freeName:"",skills:{},wpn:{}};
+  ATK.forEach(a=>{c.skills[a.k]=0; if(a.wpn) c.wpn[a.k]="";});
+  MA.forEach(a=>c.skills[a.k]=0);
+  c.skills.free=0; c.wpn.free="";
+  return c;
+}
+/** 自由記入枠を攻撃として扱う */
+function freeAtk(c){ return {k:"free", n:c.freeName||"独自技能", wpn:c.wpn.free, db:"none"}; }
+/* 初期表示用のサンプル探索者（例示用の数値です） */
+function sampleA(){
+  const c=blank("探索者A","#C9A227");
+  Object.assign(c,{hp:13,con:13,dex:15,db:"1d4",dodge:65});
+  Object.assign(c.skills,{kick:70,punch:55,headbutt:40,grapple:45,katana:60,martial:35});
+  return c;
+}
+function sampleB(){
+  const c=blank("探索者B","#4E8FC7");
+  Object.assign(c,{hp:12,con:12,dex:13,db:"0",dodge:58});
+  Object.assign(c.skills,{punch:50,kick:35,handgun:65,knife:55,throw:40});
+  c.wpn.handgun="1d10"; c.wpn.knife="1d4"; c.wpn.throw="1d6";
+  return c;
+}
+const PC=[sampleA(),sampleB()];
+
+/* ---------- flavour ---------- */
+const FLAV = {
+  kick:["鋭いキックを{D}に叩き込む！","体重を乗せた回し蹴りが{D}の脇腹を襲う！","{A}の足が唸りを上げて{D}へ伸びる！","踏み込みからの前蹴り、狙いは{D}の鳩尾だ！","低い軌道の蹴りが{D}の膝を刈りにいく！"],
+  grapple:["{A}が{D}の懐へ飛び込み、腕を絡め取ろうとする！","{D}の襟を掴み、{A}は容赦なく締め上げる！","body to body——{A}は{D}ごと床へ引き倒そうとする！","関節を極めにかかる、{D}の骨が軋む！"],
+  punch:["{A}の拳が空気を裂いて{D}の顎を狙う！","短く鋭いジャブが{D}の顔面へ！","拳を固め、{A}は{D}の胸元へ踏み込む！","{A}は歯を食いしばり、渾身の右を放つ！"],
+  headbutt:["{A}は頭から{D}へ突っ込んだ！","額を凶器に変えて、{A}が{D}の鼻面を砕きにいく！","距離を殺し、{A}の頭突きが{D}を襲う！"],
+  throw:["{A}は手にした得物を{D}めがけて投げ放った！","風を切って、それは{D}へ吸い込まれていく！","{A}の投擲——狙いは正確だ！"],
+  handgun:["{A}の銃口が{D}を捉え、火を噴いた！","乾いた銃声が室内に反響する！","引き金が引かれた。{D}へ向けて！"],
+  smg:["{A}の短機関銃が短い連射を吐き出す！","薬莢が宙を舞い、弾幕が{D}を洗う！"],
+  shotgun:["{A}のショットガンが轟音とともに鉛を撒き散らす！","至近距離、散弾が{D}を飲み込む！"],
+  machinegun:["絶え間ない連射が{D}の逃げ場を潰していく！","{A}は引き金を引き絞ったまま薙ぎ払う！"],
+  rifle:["{A}は照準を絞り、静かに撃った！","一発必中——{A}のライフルが火を噴く！"],
+  katana:["白刃が翻り、{A}は{D}へ斬りかかった！","{A}の刀が月光のような弧を描く！","抜き打ちの一閃、{D}の胴を薙ぐ！"],
+  knife:["{A}の刃が{D}の隙間を縫って走る！","短い刃が{D}の脇腹へ滑り込む！","{A}はナイフを逆手に持ち替え、踏み込んだ！"]
+};
+const F_DODGE_OK=["{D}は身を捻り、紙一重で躱した！","{D}は床を蹴って後方へ跳ぶ——掠りもしない！","寸前で{D}が体を沈める。攻撃は虚しく空を切った。","{D}の目が動きを捉えていた。難なく回避！"];
+const F_DODGE_NG=["{D}は躱そうとするが避けきれない！","反応が一瞬遅れた。{D}はまともに喰らう！","{D}の体勢が崩れていた——直撃だ！","逃げ場はなかった。{D}は受けるしかない！"];
+const F_CRIT=["完璧な一撃だ——{D}に回避の余地はない！","{A}の動きが噛み合った。狙い澄ました致命の一手！"];
+const F_FUMBLE=["{A}は大きくバランスを崩した。攻撃は空振りに終わる。","勢い余って{A}は自分の足に躓いた——好機を逃す。","{A}の手元が狂った。何も起こらない。"];
+const F_MISS=["{A}の一撃は{D}を捉えきれなかった。","わずかに届かない。{A}は悔しそうに顔を歪めた。","{A}の狙いは外れ、空気だけが鳴った。"];
+const F_FREE=["{A}の{S}が{D}を襲う！","{A}は{S}で{D}へ仕掛けた！","間合いを詰め、{A}の{S}が唸る！","{A}は渾身の{S}を{D}へ叩き込む！"];
+const F_MA=["マーシャルアーツの理合いが乗る——威力が跳ね上がる！","鍛え抜かれた体術が一撃を別物に変える！"];
+const F_SHOCK_OK=["視界が白く濁る。それでも{A}は膝をつかなかった。","激痛。だが{A}は歯を食いしばって立っている。"];
+const F_SHOCK_NG=["{A}の意識がぷつりと途切れた。","痛みが限界を超え、{A}は崩れ落ちる。"];
+const F_LOW=["これ以上は保たない——{A}は膝から崩れ落ちた。","{A}の体から力が抜け、ゆっくりと床に伏した。"];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const fill=(s,A,D)=>s.replace(/\{A\}/g,A).replace(/\{D\}/g,D);
+
+const PALETTE=["#C9A227","#E0803A","#D8503C","#B4342A","#C2436E","#9B4BB5","#6E4FD0","#4E6FD6",
+  "#4E8FC7","#3FB0C4","#3FB58D","#5CB84E","#9CC13A","#E0C341","#8A6B3F","#B98A6A",
+  "#E3E8F1","#A9B4C6","#7A889E","#4F5C72","#2E3A4C","#111724","#F0A7C0","#7FE3D0"];
+function readable(hex){
+  const r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+  return (r*299+g*587+b*114)/1000 > 150 ? "#101724" : "#F2F6FF";
+}
+
+/* ---------- UI: character panels ---------- */
+const field=document.getElementById("field");
+function stick(color){
+  return `<svg viewBox="0 0 60 100" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" aria-hidden="true">
+  <circle cx="30" cy="14" r="10" fill="none"/><path d="M30 24 V60"/><path d="M30 32 L12 46"/><path d="M30 32 L48 46"/>
+  <path d="M30 60 L16 92"/><path d="M30 60 L44 92"/></svg>`;
+}
+function panel(i){
+  const c=PC[i], side=i===0?"A":"B";
+  const skRows = ATK.concat(MA).map(a=>{
+    const v=c.skills[a.k]||0;
+    const wcell = a.wpn!==undefined
+      ? `<input class="wpn" type="text" data-i="${i}" data-wpn="${a.k}" value="${c.wpn[a.k]||""}" placeholder="${a.wpn}" aria-label="${a.n}の武器ダメージ">`
+      : `<span class="ph">${a.dice?a.dice+(a.db==="full"?"+DB":""):"—"}</span>`;
+    return `<div class="sk ${v?"":"off"}" data-row="${i}-${a.k}">
+      <span>${a.n}</span>
+      <input type="number" min="0" max="100" data-i="${i}" data-sk="${a.k}" value="${v}" aria-label="${a.n}の技能値">
+      ${wcell}</div>`;
+  }).join("");
+  const pal = PALETTE.map(h=>`<button type="button" data-setcol="${i}" data-col="${h}" style="background:${h}" title="${h}" aria-label="色 ${h}"></button>`).join("");
+  return `<section class="card ${i?"b":""}">
+    <header>
+      <button type="button" class="tagbtn" data-pal="${i}" style="background:${c.color};color:${readable(c.color)}"
+        title="棒人間の色を選ぶ" aria-haspopup="true" aria-expanded="false">${side}</button>
+      <input type="text" data-i="${i}" data-f="name" value="${c.name}" aria-label="キャラクター名">
+      <div class="pal" id="pal${i}" hidden>${pal}</div>
+    </header>
+    <div class="body">
+      <div class="row-io">
+        <button class="ghost" data-import="${i}">キャラコマデータを読み込む</button>
+        <button class="ghost" data-clear="${i}">空にする</button>
+      </div>
+      <div class="port">
+        <div class="thumb" id="th${i}">${c.img?`<img src="${c.img}" alt="">`:stick(c.color)}</div>
+        <div><label for="fi${i}">立ち絵（画像ファイル・任意）</label><input id="fi${i}" type="file" accept="image/*" data-img="${i}"></div>
+      </div>
+      <div class="stats">
+        <div><label>HP</label><input type="number" data-i="${i}" data-f="hp" value="${c.hp}"></div>
+        <div><label>CON</label><input type="number" data-i="${i}" data-f="con" value="${c.con}"></div>
+        <div><label>DEX</label><input type="number" data-i="${i}" data-f="dex" value="${c.dex}"></div>
+        <div><label>DB</label><input type="text" data-i="${i}" data-f="db" value="${c.db}"></div>
+      </div>
+      <div class="skills">
+        <h4>回 避</h4>
+        <div class="sk"><span>回避</span><input type="number" min="0" max="100" data-i="${i}" data-f="dodge" value="${c.dodge}" aria-label="回避技能値"><span class="ph">1d100</span></div>
+        <h4 style="margin-top:14px">戦 闘 技 能 ／ 武 器 ダ メ ー ジ</h4>
+        ${skRows}
+        <div class="freewrap">
+          <h4 style="margin-bottom:8px">自 由 記 入 枠</h4>
+          <div class="sk free">
+            <input type="text" data-i="${i}" data-f="freeName" value="${c.freeName||""}" placeholder="技能名" aria-label="独自技能の名前">
+            <input type="number" min="0" max="100" data-i="${i}" data-sk="free" value="${c.skills.free||0}" aria-label="独自技能の技能値">
+            <input class="wpn" type="text" data-i="${i}" data-wpn="free" value="${c.wpn.free||""}" placeholder="1d8+1d4" aria-label="独自技能のダメージ">
+          </div>
+          <p class="hint" style="margin:6px 0 0;font-size:11px">ダメージは記入した式をそのまま使います（DBを加える場合は式に含めてください）。</p>
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+function renderField(){
+  field.innerHTML = panel(0) + `<div class="vs">VS</div>` + panel(1);
+}
+function refreshGauges(){
+  for(let i=0;i<2;i++){
+    document.getElementById("gn"+i).textContent = PC[i].name || ("探索者"+(i?"B":"A"));
+    document.getElementById("gh"+i).textContent = `HP ${PC[i].hp} / ${PC[i].hp}`;
+    const bar=document.getElementById("gb"+i);
+    bar.classList.remove("low"); bar.firstElementChild.style.width="100%";
+    const f=document.getElementById("f"+i);
+    f.className="fighter "+(i?"R":"L");
+    f.innerHTML = PC[i].img ? `<img src="${PC[i].img}" alt="">` : stick(PC[i].color||(i?"#4E8FC7":"#C9A227"));
+  }
+}
+field.addEventListener("input",e=>{
+  const t=e.target, i=+t.dataset.i;
+  if(t.dataset.f){
+    const f=t.dataset.f;
+    PC[i][f] = (f==="name"||f==="db"||f==="freeName") ? t.value : (parseInt(t.value,10)||0);
+    if(f==="name"||f==="hp") refreshGauges();
+  }else if(t.dataset.sk){
+    PC[i].skills[t.dataset.sk] = parseInt(t.value,10)||0;
+    const row=t.closest(".sk"); row.classList.toggle("off", !PC[i].skills[t.dataset.sk]);
+  }else if(t.dataset.wpn){
+    PC[i].wpn[t.dataset.wpn]=t.value;
+  }
+});
+field.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset.img!==undefined && t.files && t.files[0]){
+    const i=+t.dataset.img, fr=new FileReader();
+    fr.onload=()=>{PC[i].img=fr.result; document.getElementById("th"+i).innerHTML=`<img src="${fr.result}" alt="">`; refreshGauges();};
+    fr.readAsDataURL(t.files[0]);
+  }
+});
+field.addEventListener("click",e=>{
+  const pb=e.target.closest("[data-pal]"), sc=e.target.closest("[data-setcol]");
+  if(pb){
+    const i=+pb.dataset.pal, el=document.getElementById("pal"+i);
+    const open=el.hidden;
+    document.querySelectorAll(".pal").forEach(x=>x.hidden=true);
+    document.querySelectorAll(".tagbtn").forEach(x=>x.setAttribute("aria-expanded","false"));
+    el.hidden=!open; pb.setAttribute("aria-expanded",String(open));
+    return;
+  }
+  if(sc){
+    const i=+sc.dataset.setcol;
+    PC[i].color=sc.dataset.col;
+    const btn=document.querySelector('[data-pal="'+i+'"]');
+    btn.style.background=PC[i].color; btn.style.color=readable(PC[i].color);
+    document.getElementById("pal"+i).hidden=true;
+    if(!PC[i].img) document.getElementById("th"+i).innerHTML=stick(PC[i].color);
+    refreshGauges();
+    return;
+  }
+  const im=e.target.closest("[data-import]"), cl=e.target.closest("[data-clear]");
+  if(im) openImport(+im.dataset.import);
+  if(cl){ const i=+cl.dataset.clear; PC[i]=blank(i?"探索者B":"探索者A", i?"#4E8FC7":"#C9A227"); renderField(); refreshGauges(); }
+});
+
+document.addEventListener("click",e=>{
+  if(!e.target.closest(".pal") && !e.target.closest("[data-pal]"))
+    document.querySelectorAll(".pal").forEach(x=>x.hidden=true);
+});
+
+/* ---------- system switch ---------- */
+/** note の先頭 <b>▼見出し</b> を summary に、残りを本文にする */
+function setNote(html){
+  const el=document.getElementById("sysnote");
+  let head="レギュレーション", body=html;
+  const m=html.match(/^\s*<b>\s*[▼▽]?\s*([^<]+?)\s*<\/b>\s*(?:<br\s*\/?>)?/i);
+  if(m){ head=m[1]; body=html.slice(m[0].length); }
+  el.querySelector("summary").textContent=head;
+  el.querySelector(".sysbody").innerHTML=body;
+}
+document.querySelectorAll(".sysbtn").forEach(b=>b.addEventListener("click",()=>{
+  if(b.disabled) return;
+  document.querySelectorAll(".sysbtn").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+  sysKey=b.dataset.sys;
+  setNote(sys().note);
+}));
+setNote(SYS.coc6.note);
+
+/* ============================================================
+   シート読み込み
+   ============================================================ */
+const dlg=document.getElementById("dlg"); let importTarget=0;
+function openImport(i){ importTarget=i; setStatus(""); dlg.showModal(); }
+function setStatus(msg,cls){ const s=document.getElementById("dlgStatus"); s.textContent=msg||""; s.className="status "+(cls||""); }
+document.getElementById("dlgClose").onclick=()=>dlg.close();
+
+/** キャラクター保管所の .js（JSON）を厳密に読む。戦闘系技能は固定順。 */
+const CS_BATTLE=["dodge","kick","grapple","punch","headbutt","throw","martial",
+                 "handgun","smg","shotgun","machinegun","rifle"];
+function fromCharasheetJson(o,c){
+  if(!o || !Array.isArray(o.TBAP)) return 0;
+  const P = k => parseInt(o["NP"+k] || o["NA"+k] || 0,10) || 0;
+  const str=P(1), con=P(2), dex=P(4), siz=P(6), hp=P(9);
+  if(hp) c.hp=hp; if(con) c.con=con; if(dex) c.dex=dex;
+  const db = String(o.dmg_bonus||"").trim();
+  if(/^[+-]?\d*[dD]\d+$|^[+-]?\d+$/.test(db)) c.db = db;
+  else if(str&&siz) c.db = sys().db(str,siz);
+  CS_BATTLE.forEach((k,i)=>{
+    const v=parseInt(o.TBAP[i],10)||0;
+    if(!v) return;
+    if(k==="dodge") c.dodge=v; else c.skills[k]=v;
+  });
+  const cv=parseInt(o.TBAP[12],10)||0;
+  const cn=(Array.isArray(o.TBAName)&&o.TBAName[0])?String(o.TBAName[0]).trim():"";
+  if(cv){
+    const ck=matchSkill(cn);
+    if(ck && ck!=="dodge") c.skills[ck]=Math.max(c.skills[ck]||0,cv);
+    else { c.skills.free=cv; c.freeName=cn||"独自技能"; }
+  }
+  if(o.pc_name) c.name=String(o.pc_name).replace(/\[[^\]]*\]/g,"").trim()||c.name;
+  if(Array.isArray(o.arms_name)) o.arms_name.forEach((nm,i)=>{
+    const key=matchSkill(nm), dm=String((o.arms_damage||[])[i]||"").trim();
+    if(key && dm && parseExpr(dm).length) c.wpn[key]=dm;
+  });
+  return 10;
+}
+/** キャラクター保管所「データ出力 → テキスト」を読む */
+function fromCharasheetText(t,c){
+  if(!/《/.test(t) && !/=合計=/.test(t)) return 0;
+  let n=0;
+  const tot=t.match(/=合計=([^\r\n]*)/);
+  let str=0,siz=0;
+  if(tot){
+    const v=(tot[1].match(/-?\d+/g)||[]).map(Number);
+    if(v.length>=10){ str=v[0]; c.con=v[1]; c.dex=v[3]; siz=v[5]; c.hp=v[8]; n+=4; }
+  }
+  const hp=t.match(/(?:^|[\r\n])\s*HP[：:]\s*(\d+)/);
+  if(hp){ c.hp=+hp[1]; n++; }
+  const db=t.match(/ダメージボーナス[：:]\s*([+-]?\d*[dD]\d+|[+-]?\d+)/);
+  if(db){ c.db=db[1].replace(/D/g,"d"); n++; }
+  else if(str&&siz){ c.db=sys().db(str,siz); n++; }
+  const re=/《([^》]{1,30})》[\s　]*(\d{1,3})\s*[%％]/g;
+  let m;
+  while((m=re.exec(t))!==null){
+    const key=matchSkill(m[1]), v=+m[2];
+    if(key==="dodge"){ c.dodge=Math.max(c.dodge,v); n++; }
+    else if(key){ c.skills[key]=Math.max(c.skills[key]||0,v); n++; }
+  }
+  /* 戦闘系技能ブロックの独自技能を自由記入枠へ */
+  const bi=t.indexOf("戦闘系技能");
+  if(bi>=0 && !c.skills.free){
+    const rest=t.slice(bi+5), e=rest.search(/系技能/);
+    const block=e>0?rest.slice(0,e):rest;
+    const re2=/《([^》]{1,30})》[\s　]*(\d{1,3})\s*[%％]/g;
+    let mm,bn="",bv=0;
+    while((mm=re2.exec(block))!==null){
+      if(matchSkill(mm[1])) continue;
+      const v=+mm[2]; if(v>bv){bv=v;bn=mm[1].trim();}
+    }
+    if(bv>1){ c.skills.free=bv; c.freeName=bn; n++; }
+  }
+  const nm=t.match(/キャラクター名[：:]\s*([^\r\n\[]+)/);
+  if(nm) c.name=nm[1].trim()||c.name;
+  /* 武器表：名称・成功率・ダメージ の順に並ぶ行を拾う */
+  t.split(/[\r\n]+/).forEach(line=>{
+    const tk=line.split(/[\s　]+/).filter(Boolean);
+    if(tk.length<3) return;
+    const key=matchSkill(tk[0]);
+    if(!key || key==="dodge") return;
+    if(!/^\d{1,3}$/.test(tk[1])) return;
+    const dm=tk[2].replace(/[Ｄ]/g,"d");
+    if(/^[+-]?\d*[dD]\d+/.test(dm) && parseExpr(dm).length){ c.wpn[key]=dm; n++; }
+  });
+  return n;
+}
+
+/** JSON / ココフォリア / プレーンテキストを許容するゆるいパーサ */
+function importData(raw,i){
+  const c = blank(PC[i].name, PC[i].color);
+  c.img = PC[i].img;
+  c.freeName = PC[i].freeName; c.wpn.free = PC[i].wpn.free; c.skills.free = PC[i].skills.free;
+  let found=0, obj=null;
+  try{ obj = JSON.parse(raw.trim().replace(/^[^[{]*/,"").replace(/;\s*$/,"")); }catch(e){ obj=null; }
+
+  /* --- 0. キャラクター保管所 .js（固定フォーマット） --- */
+  if(obj && Array.isArray(obj.TBAP)){
+    found += fromCharasheetJson(obj,c);
+    ATK.filter(a=>a.wpn).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+    return c;
+  }
+  /* --- 0b. キャラクター保管所 テキスト出力 --- */
+  if(!obj && /《[^》]*》[\s　]*\d{1,3}\s*[%％]/.test(raw)){
+    found += fromCharasheetText(raw,c);
+    if(found){
+      ATK.filter(a=>a.wpn).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+      return c;
+    }
+  }
+
+  /* --- 1. ココフォリア駒データ（最も確実） --- */
+  const kemono = obj && (obj.data || (Array.isArray(obj)&&obj[0]&&obj[0].data) || (obj.kind==="character"?obj:null));
+  const dat = (kemono && kemono.data) ? kemono.data : kemono;
+  if(dat && (dat.commands || dat.params || dat.status)){
+    if(dat.name) c.name=dat.name;
+    (dat.status||[]).forEach(s=>{
+      const l=String(s.label||"").toUpperCase();
+      if(l==="HP"||l==="耐久力") c.hp = +(s.max||s.value)||c.hp;
+    });
+    const P={};
+    (dat.params||[]).forEach(p=>{P[String(p.label||"").toUpperCase()] = parseInt(p.value,10)||0;});
+    if(P.CON) c.con=P.CON; if(P.DEX) c.dex=P.DEX;
+    if(P.STR&&P.SIZ) c.db = sys().db(P.STR,P.SIZ);
+    if(dat.commands) found += fromCommands(dat.commands,c);
+    found += 2;
+  }
+
+  /* --- 2. 一般JSON：深さ優先で走査 --- */
+  if(obj && found<3){
+    found += scanJson(obj,c);
+  }
+
+  /* --- 3. プレーンテキスト --- */
+  if(found<3 || !obj){
+    found += fromCommands(raw,c);
+  }
+  if(!found) return null;
+  return c;
+}
+/** "CCB<=70 【キック】" / "キック 70" / "キック：70" を拾う */
+function fromCommands(text,c){
+  let n=0; const s=zen(String(text));
+  const re1=/(?:CCB?|CC)\s*<=\s*(\d{1,3})\s*[^\n【\[]*[【\[]?\s*([^\n\]】]{1,24})/gi;
+  let m;
+  while((m=re1.exec(s))!==null){
+    const key=matchSkill(m[2]); if(!key) continue;
+    if(key==="dodge"){ c.dodge=Math.max(c.dodge,+m[1]); n++; }
+    else { c.skills[key]=Math.max(c.skills[key]||0,+m[1]); n++; }
+  }
+  const re2=/^[\s・>-]*([^\s:：=\d]{2,14})\s*[:：=\s]\s*(\d{1,3})\s*$/gm;
+  while((m=re2.exec(s))!==null){
+    const key=matchSkill(m[1]); const v=+m[2];
+    if(key==="dodge") {c.dodge=Math.max(c.dodge,v);n++;}
+    else if(key) {c.skills[key]=Math.max(c.skills[key]||0,v);n++;}
+    else{
+      const nm=m[1].replace(/\s/g,"").toUpperCase();
+      if(nm==="HP"||nm==="耐久力") {c.hp=v;n++;}
+      if(nm==="CON") {c.con=v;n++;}
+      if(nm==="DEX") {c.dex=v;n++;}
+      if(nm==="名前"||nm==="NAME") {/* 数値ではないので無視 */}
+    }
+  }
+  const dbm = s.match(/(?:ダメージボーナス|dmg_bonus|DB)["'\s:：=]*([+-]?\d*d\d+|[+-]\d+|0)(?![\d])/);
+  if(dbm && c.db==="0"){ c.db=dbm[1]; n++; }
+  const nm = s.match(/(?:名前|キャラクター名|PC名|name)\s*[:："']+\s*([^"'\n,、]{1,24})/);
+  if(nm) c.name=nm[1].trim();
+  return n;
+}
+/** 任意JSONを再帰的に走査して技能値・能力値を拾う */
+function scanJson(root,c){
+  let n=0; const seen=new Set(); let STR=0,SIZ=0;
+  const numish = v => typeof v==="number" ? v : (typeof v==="string" && /^\d{1,3}$/.test(v.trim()) ? +v.trim() : null);
+
+  (function walk(node,keyPath){
+    if(!node || typeof node!=="object" || seen.has(node)) return;
+    seen.add(node);
+
+    /* 平坦オブジェクト：{"キック":70} / {name:"キック", value:70} */
+    if(!Array.isArray(node)){
+      const nameVal = node.name||node.skillName||node.label||node.技能名;
+      if(typeof nameVal==="string"){
+        const key=matchSkill(nameVal);
+        const tot = ["total","sum","value","point","pt","val","合計"].map(k=>numish(node[k])).find(v=>v!==null);
+        if(key && tot!==null){
+          if(key==="dodge") c.dodge=Math.max(c.dodge,tot); else c.skills[key]=Math.max(c.skills[key]||0,tot);
+          n++;
+        }
+      }
+      for(const k in node){
+        const v=node[k], num=numish(v);
+        const kk=String(k).toUpperCase().replace(/[_\-\s]/g,"");
+        if(num!==null){
+          const key=matchSkill(k);
+          if(key){ if(key==="dodge") c.dodge=Math.max(c.dodge,num); else c.skills[key]=Math.max(c.skills[key]||0,num); n++; }
+          else if(kk==="HP"||kk==="NHP"||kk==="HPMAX"||kk==="MAXHP"||kk==="耐久力"){ if(num>0&&num<40){c.hp=Math.max(c.hp,num);n++;} }
+          else if(kk==="CON"||kk==="NCON") {c.con=num;n++;}
+          else if(kk==="DEX"||kk==="NDEX") {c.dex=num;n++;}
+          else if(kk==="STR"||kk==="NSTR") STR=num;
+          else if(kk==="SIZ"||kk==="NSIZ"||kk==="SIZE") SIZ=num;
+        }
+        if(typeof v==="string" && (k==="pc_name"||k==="name"||k==="characterName") && v.trim() && !matchSkill(v)) {
+          if(c.name==="探索者A"||c.name==="探索者B"||!c.name) c.name=v.trim();
+        }
+        if(typeof v==="string" && /CCB?\s*<=/.test(v)) n+=fromCommands(v,c);
+        if(v && typeof v==="object") walk(v,k);
+      }
+      return;
+    }
+
+    /* 配列：名前配列と数値配列の並走（保管所形式）を推定 */
+    const strs = node.map(x=>typeof x==="string"?x:null);
+    const hits = strs.map(matchSkill);
+    if(hits.some(Boolean) && Array.isArray(node)){
+      /* 同階層の兄弟配列は walk 呼び出し元で処理されるためここでは何もしない */
+    }
+    node.forEach(v=>{ if(v&&typeof v==="object") walk(v,keyPath); });
+  })(root,"");
+
+  /* 兄弟配列マッチング（{"TBTAname":[...],"TBTAtotal":[...]} 形式） */
+  (function siblings(node){
+    if(!node||typeof node!=="object") return;
+    if(!Array.isArray(node)){
+      const arrs = Object.keys(node).filter(k=>Array.isArray(node[k]));
+      const nameArrs = arrs.filter(k=>node[k].some(v=>typeof v==="string"&&matchSkill(v)));
+      for(const na of nameArrs){
+        const names=node[na], len=names.length;
+        const cands = arrs.filter(k=>k!==na && node[k].length===len &&
+          node[k].some(v=>numish(v)!==null));
+        const best = cands.sort((a,b)=>score(b)-score(a))[0];
+        if(!best) continue;
+        names.forEach((nm,idx)=>{
+          const key=matchSkill(nm); const v=numish(node[best][idx]);
+          if(key && v!==null){ if(key==="dodge") c.dodge=Math.max(c.dodge,v); else c.skills[key]=Math.max(c.skills[key]||0,v); n++; }
+        });
+      }
+    }
+    Object.values(node).forEach(v=>{ if(v&&typeof v==="object") siblings(v); });
+    function score(k){
+      const s=k.toLowerCase();
+      if(/total|sum|合計/.test(s)) return 3;
+      if(/point|pt|value|val/.test(s)) return 2;
+      return 1;
+    }
+  })(root);
+
+  if(STR&&SIZ&&c.db==="0"){ c.db=sys().db(STR,SIZ); n++; }
+  /* 武器ダメージの既定値を補完（技能があるのに武器未入力なら標準値を入れる） */
+  ATK.filter(a=>a.wpn).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+  return n;
+}
+document.getElementById("dlgParse").onclick=()=>{
+  const raw=document.getElementById("dlgText").value;
+  if(!raw.trim()) return setStatus("データが空です。シートの出力を貼り付けてください。","ng");
+  const c=importData(raw,importTarget);
+  if(!c) return setStatus("読み取れる項目が見つかりませんでした。別の出力形式（ココフォリア出力が最も確実です）をお試しください。","ng");
+  PC[importTarget]=c; renderField(); refreshGauges();
+  const got=Object.values(c.skills).filter(v=>v>0).length;
+  setStatus(`「${c.name}」を反映しました（戦闘技能 ${got} 件 / HP ${c.hp} / CON ${c.con} / DEX ${c.dex} / DB ${c.db}）。数値をご確認ください。`,"ok");
+};
+/* ============================================================
+   戦闘エンジン
+   ============================================================ */
+let SPEED=1, running=false, abort=false;
+const logEl=document.getElementById("log");
+const sleep=ms=>new Promise(r=>setTimeout(r, SPEED===0?0:ms*SPEED));
+function put(cls,html){
+  const p=document.createElement("p");
+  p.className=cls; p.innerHTML=html;
+  logEl.appendChild(p); logEl.scrollTop=logEl.scrollHeight;
+  return p;
+}
+function fx(el,cls,ms){
+  if(SPEED===0) return;
+  el.classList.add(cls);
+  setTimeout(()=>el.classList.remove(cls), ms);
+}
+function popup(i,text,cls){
+  if(SPEED===0) return;
+  const a=document.getElementById("arena");
+  const p=document.createElement("div");
+  p.className="popup "+(cls||""); p.textContent=text;
+  p.style.left=(i===0?"20%":"72%"); p.style.top="34%";
+  a.appendChild(p); setTimeout(()=>p.remove(),1000);
+}
+function setHP(i,cur,max){
+  const bar=document.getElementById("gb"+i);
+  const pct=Math.max(0,cur/max*100);
+  bar.firstElementChild.style.width=pct+"%";
+  bar.classList.toggle("low", pct<=50);
+  document.getElementById("gh"+i).textContent=`HP ${Math.max(0,cur)} / ${max}`;
+}
+
+/** 1d100 を10面ダイス2個で振る演出 */
+async function showDice(val,side){
+  if(SPEED===0) return;
+  const box=document.getElementById("dice"+(side===1?1:0));
+  const tens=box.querySelector(".tens"), ones=box.querySelector(".ones"), res=box.querySelector(".dieres");
+  const t=(val>=100?0:Math.floor(val/10)*10), o=val%10;
+  res.classList.remove("on"); res.textContent="";
+  box.classList.add("on"); tens.classList.add("tumble"); ones.classList.add("tumble");
+  const iv=setInterval(()=>{
+    tens.textContent=String(Math.floor(Math.random()*10)*10).padStart(2,"0");
+    ones.textContent=Math.floor(Math.random()*10);
+  },70);
+  await sleep(460);
+  clearInterval(iv);
+  tens.classList.remove("tumble"); ones.classList.remove("tumble");
+  tens.textContent=String(t).padStart(2,"0"); ones.textContent=o;
+  res.textContent="＝ "+val; res.classList.add("on");
+  await sleep(430);
+  box.classList.remove("on");
+}
+
+/** 技能ロール */
+function skillRoll(target){
+  const r=d(100);
+  const crit = sysKey==="coc6" ? r<=5 : r===1;
+  const fum  = sysKey==="coc6" ? r>=96 : (r===100 || (r>=96 && target<50));
+  const ok = !fum && (crit || r<=target);
+  return {r,ok,crit,fum};
+}
+function rollTag(res){
+  if(res.crit) return `<b class="c">クリティカル！</b>`;
+  if(res.fum)  return `<b class="f">ファンブル！</b>`;
+  return res.ok ? `<b class="s">成功！</b>` : `<b class="f">失敗！</b>`;
+}
+
+/** 使用可能な攻撃の一覧 */
+function options(c){
+  const list=ATK.concat(c.skills.free>0 ? [freeAtk(c)] : []);
+  return list.filter(a=>{
+    if(!(c.skills[a.k]>0)) return false;
+    if(a.wpn!==undefined && !parseExpr(c.wpn[a.k]).length) return false;
+    return true;
+  });
+}
+/** 技能値が最も高い攻撃を選ぶ（同値ならその中からランダム） */
+function chooseAttack(c){
+  const o=options(c);
+  if(!o.length) return null;
+  const top=Math.max.apply(null, o.map(a=>c.skills[a.k]));
+  const best=o.filter(a=>c.skills[a.k]===top);
+  return best[Math.floor(Math.random()*best.length)];
+}
+
+async function turn(atk,def,ai,di,state){
+  const A=atk.name, D=def.name;
+  put("l-turn", `${A}のターン！`);
+  await sleep(320);
+  if(atk.skipTurn){
+    atk.skipTurn=false;
+    put("l-flav", `${A}は崩れた体勢を立て直すので精一杯だ——攻撃できない！`);
+    await sleep(620); return;
+  }
+  const a=chooseAttack(atk);
+  if(!a){
+    put("l-flav", `${A}には振るえる戦闘技能がない。ただ身構えるだけだ……`);
+    await sleep(500); return;
+  }
+  /* --- 攻撃ロール（マーシャルアーツ／武道があれば組み合わせロール） --- */
+  const sk=atk.skills[a.k];
+  const maSkill = a.ma ? MA.find(m=>atk.skills[m.k]>0) : null;
+  const maVal = maSkill ? atk.skills[maSkill.k] : 0;
+  const cmdLabel = maSkill ? `CBRB(${sk},${maVal})` : `${sys().cmd}${sk}`;
+  put("l-roll", `${A}の${a.n}${maSkill?`＋${maSkill.n}`:""}！　${cmdLabel} ⇒ <span>?</span>`);
+  const line=logEl.lastElementChild;
+  const res=skillRoll(sk);
+  await showDice(res.r, ai);
+  await sleep(SPEED===0?0:60);
+  const maOK = !!maSkill && res.ok && !res.fum && res.r<=maVal;
+  let tag;
+  if(res.fum||res.crit||!res.ok) tag=rollTag(res);
+  else if(maSkill) tag = maOK ? `<b class="s">${a.n}・${maSkill.n}ともに成功！</b>` : `<b class="s">${a.n}のみ成功！</b>`;
+  else tag = rollTag(res);
+  line.innerHTML = `${A}の${a.n}${maSkill?`＋${maSkill.n}`:""}！　${cmdLabel} ⇒ ${res.r} ${tag}`;
+
+  if(res.fum){
+    await sleep(240);
+    put("l-flav", fill(pick(F_FUMBLE),A,D));
+    put("l-sys", `${A}は次の攻撃ができない！（回避は可能）`);
+    atk.skipTurn = true;
+    fx(document.getElementById("f"+ai),"hitshake",320);
+    await sleep(600); return;
+  }
+  if(!res.ok){
+    await sleep(240);
+    put("l-flav", fill(pick(F_MISS),A,D));
+    await sleep(560); return;
+  }
+  /* --- 演出：踏み込み --- */
+  await sleep(200);
+  put("l-flav", fill(pick(FLAV[a.k]||F_FREE),A,D).replace(/\{S\}/g,a.n));
+  const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
+  fx(fa, ai===0?"lungeR":"lungeL", 420);
+  if(maOK){ await sleep(240); put("l-flav", fill(pick(F_MA),A,D)); }
+
+  /* --- 回避 --- */
+  let dodged=false;
+  if(res.crit){
+    await sleep(300);
+    put("l-flav", fill(pick(F_CRIT),A,D));
+  }else{
+    await sleep(320);
+    const dr=skillRoll(def.dodge||0);
+    await showDice(dr.r, di);
+    put("l-roll", `${D}の回避！　${sys().cmd}${def.dodge||0} ⇒ ${dr.r} ${rollTag(dr)}`);
+    dodged = dr.ok;
+    await sleep(240);
+    put("l-flav", fill(pick(dodged?F_DODGE_OK:F_DODGE_NG),A,D));
+    if(dodged){
+      fx(fd, di===0?"dodgeL":"dodgeR", 420);
+      popup(di,"MISS","miss");
+      await sleep(620); return;
+    }
+  }
+
+  /* --- ダメージ --- */
+  const baseTerms = a.wpn!==undefined ? parseExpr(atk.wpn[a.k]) : parseExpr(a.dice);
+  const dbTerms   = parseExpr(atk.db);
+  const mul = maOK?2:1;
+  let dmg, label, detail;
+  if(a.db==="full"){
+    label = exprLabel(baseTerms,mul) + (atk.db&&atk.db!=="0" ? "+"+exprLabel(dbTerms) : "");
+    if(res.crit){ dmg = maxOf(baseTerms,mul) + maxOf(dbTerms); detail="最大値"; }
+    else{ const b=rollTerms(baseTerms,mul), db=rollTerms(dbTerms); dmg=b.total+db.total;
+          detail = fmtParts(b,db); }
+  }else if(a.db==="half"){
+    const dbr = res.crit ? maxOf(dbTerms) : rollTerms(dbTerms).total;
+    const half = Math.floor(Math.abs(dbr)/2)*(dbr<0?-1:1);
+    label = exprLabel(baseTerms,mul) + (atk.db&&atk.db!=="0" ? "+["+exprLabel(dbTerms)+"÷2]" : "");
+    const b = res.crit ? {total:maxOf(baseTerms,mul),parts:[]} : rollTerms(baseTerms,mul);
+    dmg = b.total + half;
+    detail = res.crit ? "最大値" : fmtParts(b,{total:half,parts:[{label:"DB÷2",rolls:null,sum:half}]});
+  }else{
+    label = exprLabel(baseTerms,mul);
+    if(res.crit){ dmg=maxOf(baseTerms,mul); detail="最大値"; }
+    else{ const b=rollTerms(baseTerms,mul); dmg=b.total; detail=fmtParts(b,null); }
+  }
+  dmg=Math.max(1,dmg);
+  await sleep(300);
+  put("l-roll", `${label} ⇒ ${dmg}${detail?`　<span style="color:#5B677C">（${detail}）</span>`:""}`);
+  put("l-dmg", `${dmg}のダメージ！`);
+  fx(fd,"hitshake",340); popup(di,"-"+dmg);
+  const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
+
+  def.cur -= dmg;
+  setHP(di, def.cur, def.max);
+  await sleep(420);
+
+  /* --- HP2以下で即ノックアウト --- */
+  if(def.cur<=2){
+    put("l-kill", fill(pick(F_LOW),D,A));
+    put("l-sys", `${D}のHPは${Math.max(0,def.cur)}。行動不能——ノックアウト！`);
+    state.ko=di; return;
+  }
+  /* --- ショックロール（現在HPが最大の半分以下になったとき1回） --- */
+  if(!def.shocked && def.cur <= Math.floor(def.max/2)){
+    def.shocked=true;
+    const t=sys().shock(def), sr=skillRoll(t);
+    put("l-sys", `${D}のHPが半分を割った——ショックロール発生！`);
+    await sleep(240);
+    await showDice(sr.r, di);
+    put("l-roll", `${sys().cmd}${t}（${sys().shockLabel(def)}） ⇒ ${sr.r} ${sr.ok?'<b class="s">成功！</b>':'<b class="f">失敗！</b>'}`);
+    await sleep(240);
+    put("l-flav", fill(pick(sr.ok?F_SHOCK_OK:F_SHOCK_NG),D,A));
+    if(!sr.ok){ put("l-sys", `${D}は気絶した——ノックアウト！`); state.ko=di; return; }
+  }
+  await sleep(380);
+}
+function fmtParts(b,db){
+  const seg=[];
+  (b.parts||[]).forEach(p=>{ if(p.rolls) seg.push(p.label+":"+p.rolls.join("+")); });
+  if(db){ (db.parts||[]).forEach(p=>{ seg.push(p.rolls?p.label+":"+p.rolls.join("+"):"DB"+(p.sum>=0?"+":"")+p.sum); }); }
+  return seg.join(" / ");
+}
+
+async function battle(){
+  if(running) return;
+  running=true; abort=false;
+  logEl.innerHTML=""; document.getElementById("start").disabled=true;
+  document.getElementById("logmeta").textContent="交戦中";
+
+  const F=[0,1].map(i=>{
+    const c=JSON.parse(JSON.stringify(PC[i]));
+    c.max=Math.max(1,c.hp); c.cur=c.max; c.shocked=false; c.skipTurn=false; c.idx=i;
+    if(!c.name) c.name = i?"探索者B":"探索者A";
+    return c;
+  });
+  [0,1].forEach(i=>{document.getElementById("f"+i).classList.remove("ko"); setHP(i,F[i].cur,F[i].max);});
+
+  put("l-sys", `システム：${sys().name}`);
+  put("l-sys", `${F[0].name}（HP${F[0].max} / DEX${F[0].dex} / DB${F[0].db}）　対　${F[1].name}（HP${F[1].max} / DEX${F[1].dex} / DB${F[1].db}）`);
+  await sleep(500);
+
+  /* --- 先攻決定 --- */
+  let order;
+  if(F[0].dex!==F[1].dex){
+    order = F[0].dex>F[1].dex ? [0,1] : [1,0];
+    put("l-sys", `DEXは ${F[0].name} ${F[0].dex} ／ ${F[1].name} ${F[1].dex}。${F[order[0]].name}が先手を取った。`);
+  }else{
+    let a,b; do{ a=d(100); b=d(100); }while(a===b);
+    await showDice(a,0); await showDice(b,1);
+    put("l-roll", `DEX同値——1d100で先攻決定！　${F[0].name}:${a}　${F[1].name}:${b}`);
+    order = a<b ? [0,1] : [1,0];
+    put("l-sys", `値の低い ${F[order[0]].name} が先手！`);
+  }
+  await sleep(600);
+
+  const state={ko:-1};
+  const MAXR=30;
+  let round=1;
+  for(; round<=MAXR && state.ko<0 && !abort; round++){
+    put("l-round", `■□■　ROUND ${round}　■□■`);
+    const rf=document.getElementById("rflash");
+    if(SPEED!==0){ rf.textContent="ROUND "+round; rf.classList.remove("go"); void rf.offsetWidth; rf.classList.add("go"); }
+    await sleep(700);
+    for(const ai of order){
+      if(state.ko>=0||abort) break;
+      const di = ai===0?1:0;
+      await turn(F[ai],F[di],ai,di,state);
+    }
+  }
+
+  /* --- 決着 --- */
+  await sleep(400);
+  if(abort){ put("l-sys","戦闘は中断された。"); }
+  else if(state.ko>=0){
+    const loser=F[state.ko], winner=F[state.ko===0?1:0];
+    document.getElementById("f"+state.ko).classList.add("ko");
+    put("l-end", `WINNER — ${winner.name}`);
+    put("l-flav", `${loser.name}は倒れ伏し、${winner.name}だけが立っていた。残りHPは ${Math.max(0,winner.cur)} / ${winner.max}。`);
+    document.getElementById("logmeta").textContent=`決着（${round-1}ラウンド）`;
+  }else{
+    const w = F[0].cur===F[1].cur ? null : (F[0].cur>F[1].cur?F[0]:F[1]);
+    put("l-end", w?`判定勝ち — ${w.name}`:"引 き 分 け");
+    put("l-flav", `${MAXR}ラウンドを戦い抜き、${w?`HPに余裕のある${w.name}の優勢で終わった`:"両者ともに立ったままだった"}。`);
+    document.getElementById("logmeta").textContent="時間切れ";
+  }
+  running=false; document.getElementById("start").disabled=false;
+}
+
+/* ---------- controls ---------- */
+document.getElementById("start").onclick=battle;
+document.getElementById("reset").onclick=()=>{
+  abort=true; logEl.innerHTML=""; document.getElementById("logmeta").textContent="待機中";
+  [0,1].forEach(i=>document.getElementById("f"+i).classList.remove("ko"));
+  refreshGauges();
+};
+document.querySelectorAll("[data-spd]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-spd]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  SPEED=parseFloat(b.dataset.spd);
+});
+document.getElementById("copylog").onclick=()=>{
+  const txt=[...logEl.children].map(p=>p.textContent).join("\n");
+  navigator.clipboard.writeText(txt).then(
+    ()=>{document.getElementById("logmeta").textContent="ログをコピーしました";},
+    ()=>{document.getElementById("logmeta").textContent="コピーできませんでした";}
+  );
+};
+
+/* ---------- boot ---------- */
+renderField(); refreshGauges();
+put("l-sys","システム：クトゥルフ神話TRPG（6版）");
+put("l-round","■□■　ROUND 1　■□■");
+put("l-turn","探索者Aのターン！");
+put("l-roll",'探索者Aのキック！　CCB<=70 ⇒ 63 <b class="s">成功！</b>');
+put("l-flav","鋭いキックを探索者Bに叩き込む！");
+put("l-roll",'探索者Bの回避！　CCB<=58 ⇒ 67 <b class="f">失敗！</b>');
+put("l-flav","探索者Bは躱そうとするが避けきれない！");
+put("l-roll",'1d6+1d4 ⇒ 5　<span style="color:#5B677C">（1d6:3 / 1d4:2）</span>');
+put("l-dmg","5のダメージ！");
+put("l-sys","　");
+put("l-sys","↑ サンプル表示です。「開戦」でこの2人が実際に戦います。");
+</script>

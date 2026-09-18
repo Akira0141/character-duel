@@ -95,7 +95,9 @@ header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 24px;borde
 @keyframes pop{0%{opacity:0;transform:translateY(10px) scale(.7)}25%{opacity:1;transform:translateY(-8px) scale(1.1)}100%{opacity:0;transform:translateY(-52px) scale(1)}}
 .dicebox{position:absolute;top:62%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;
   align-items:center;opacity:0;transition:opacity .18s;pointer-events:none;z-index:5}
-.dicerow{display:flex;gap:9px}
+.dicerow{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;max-width:190px}
+.dicerow.many{gap:6px}
+.dicerow.many .die{width:32px;height:32px;font-size:12px}
 .dicebox.L{left:4%}.dicebox.R{right:4%}
 .dicebox.on{opacity:1}
 .die{width:44px;height:44px;background:linear-gradient(160deg,#EFE8D4,#BFB69C);color:#141A16;
@@ -183,6 +185,30 @@ input:focus,textarea:focus{border-color:var(--azure);outline:none}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 .row-io{display:flex;gap:8px;margin-bottom:12px}
 .row-io button{flex:1}
+.esk{display:grid;grid-template-columns:1fr 46px auto 46px;gap:6px;align-items:center;margin-bottom:5px}
+.esk span{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.esk input{padding:4px 7px;font-size:13px;text-align:right}
+.esk input.esname{text-align:left;font-family:var(--ui);font-size:12.5px}
+.esk em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--parch-dim)}
+.esk.off span,.esk.off .esn i{color:#5B677C}
+.esn{display:flex;align-items:center;gap:6px;min-width:0}
+.esn i{font-style:normal;font-size:13px;color:var(--parch);white-space:nowrap}
+.esn input{flex:1;min-width:0}
+.sk.defrow span{white-space:normal}
+.stats.emo{grid-template-columns:1fr 1fr 2fr}
+.stats.emo select,.ewpn select{font-family:var(--ui);font-size:13px;padding:7px 8px;cursor:pointer}
+.ewpn{margin-top:10px}
+.ewpn.overridden select{opacity:.45}
+.ewfree{margin-top:8px}
+.ewrow{display:grid;grid-template-columns:1fr 1.3fr;gap:7px}
+.ewrow input{font-size:13px;padding:6px 8px;min-width:0}
+.ewrow input[data-ef="freeWpnName"]{font-family:var(--ui)}
+.ewnote{margin:5px 0 0;font-size:11px;color:var(--parch-dim);line-height:1.6}
+.ewnote.on{color:var(--phos)}
+.ewnote.bad{color:var(--blood-soft)}
+.field>*{min-width:0}
+select{max-width:100%;min-width:0;text-overflow:ellipsis}
+.yujin-note{margin:6px 0 0;font-size:11px;color:var(--phos);line-height:1.6}
 .dbnote{margin:6px 0 0;font-size:11px;color:var(--parch-dim);line-height:1.6}
 .dbnote.calc{color:var(--phos)}
 input.dbcalc{border-color:var(--phos);box-shadow:0 0 0 1px rgba(201,162,39,.25)}
@@ -228,6 +254,7 @@ dialog textarea{height:150px;font-size:12.5px;line-height:1.5;resize:vertical}
 .l-round{font-family:var(--disp);font-weight:800;color:var(--phos);letter-spacing:.22em;margin:20px 0 8px!important;font-size:16px}
 .l-round:first-child{margin-top:0!important}
 .l-turn{font-family:var(--disp);font-size:15px;color:var(--parch);margin-top:12px!important;letter-spacing:.08em}
+.nm-chip{color:#F2F6FF;padding:0 .35em;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(242,246,255,.28)}
 .l-roll{font-family:var(--mono);font-size:13px;color:#93A6C0;font-variant-numeric:tabular-nums}
 .l-roll b.s{color:var(--azure)}
 .l-roll b.f{color:var(--blood-soft)}
@@ -260,7 +287,7 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 <div class="systems" role="group" aria-label="システム選択">
   <button class="sysbtn" data-sys="coc6" aria-pressed="true">クトゥルフ神話TRPG（6版）</button>
   <button class="sysbtn" data-sys="coc7" aria-pressed="false">新クトゥルフ神話TRPG（7版）</button>
-  <button class="sysbtn" data-sys="emo" aria-pressed="false" disabled>エモクロア／ガイアケア（準備中）</button>
+  <button class="sysbtn" data-sys="emo" aria-pressed="false">エモクロア／ガイアケア</button>
 </div>
 <details class="sysnote" id="sysnote"><summary>レギュレーション</summary><div class="sysbody"></div></details>
 
@@ -300,8 +327,9 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 <div class="field" id="field"></div>
 
 <footer class="foot">
-  ダイス判定・ダメージ算出はすべてこのページ内で完結します（サーバーへの送信はありません）。<br>
-  クトゥルフ神話TRPG／新クトゥルフ神話TRPGはArkham Horror LLC・株式会社KADOKAWAの著作物に基づく非公式のファンツールです。
+  ダイス判定・ダメージ算出はすべてこのページ内で完結します<b>（サーバーへの送信はありません）</b>。<br>
+  本ツールの「クトゥルフ神話TRPG」「新クトゥルフ神話TRPG」モードは、「株式会社アークライト」及び「株式会社KADOKAWA」が権利を有する『クトゥルフ神話TRPG』シリーズの二次創作物です。<br>
+　本ツールの「エモクロア／ガイアケア」モードは、ダイスタス・コモンズ：クレジット表示不要、改変利用不可、公演利用許可（収益化OK）、営利利用許可です。
 </footer>
 </div>
 
@@ -311,6 +339,7 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
     <label for="dlgText">キャラコマデータを貼り付け（ココフォリア駒データ／JSON／テキスト出力）</label>
     <textarea id="dlgText" placeholder="ここにデータを貼り付けてください"></textarea>
     <div class="row-io" style="margin-top:8px"><button class="ghost" id="dlgParse">解析してフォームに反映</button></div>
+    <div id="helpCoc">
     <p class="hint">
       <b>データの出し方</b>
       <ul>
@@ -322,6 +351,18 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
       貼り付けたデータに<b>ダメージボーナス（DB）</b>が含まれていれば、その値をそのまま使います。含まれていない場合のみ STR＋SIZ から自動算出します（いあきゃらのココフォリア駒出力にはDBが含まれないため、自動算出になります）。シート上でDBを手動で変更している場合は、読み込み後にDB欄を直接書き換えてください。<br><br>
       反映後は念のため数値を目視で確認してください。書式の違いで拾い漏れた項目は手入力できます。
     </p>
+    </div>
+    <div id="helpEmo" hidden>
+    <p class="hint">
+      <b>データの出し方</b>
+      <ul>
+        <li><b>キャラッシュ（charash）</b>…キャラクターシート最下部の「CCFOLIA駒形式でコピー」を押し、そのまま貼り付け</li>
+      </ul>
+      読み込めるのは HP・イニシアチブと、戦闘に使う技能（攻撃・回避・防御・心肺停止・気絶判定に使うもの）です。<br>
+      <b>武器</b>と<b>人間／融人の種別</b>はデータに含まれないため、読み込み後にプルダウンで選んでください。<br><br>
+      反映後は念のため数値を目視で確認してください。
+    </p>
+    </div>
     <div class="status" id="dlgStatus"></div>
   </div>
 </dialog>
@@ -377,7 +418,7 @@ const SYS = {
   coc6:{
     name:"クトゥルフ神話TRPG（6版）",
     cmd:"CCB<=",
-    note:"<b>▼レギュレーション</b><br>判定は<b>CCB</b>。<br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br><b>1〜5でクリティカル</b>（回避不可・最大ダメージ）、<b>96〜100でファンブル</b>（次回攻撃不可）。<br>武道はマーシャルアーツと同じ扱い（dbを省くダメージ2倍）、素手技能と組み合わせロール。<br>銃火器Rは無し。自分のターンで1発のみ撃つ。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は抽選。<br>特殊な武器は最下部の「自由記入枠」に手動で入れてください。",
+    note:"<b>▼レギュレーション（ハウスルール）</b><br>判定は<b>CCB</b>。<br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br><b>1〜5でクリティカル</b>（回避不可・最大ダメージ）、<b>96〜100でファンブル</b>（次回攻撃不可）。<br>武道はマーシャルアーツと同じ扱い（dbを省くダメージ2倍）、素手技能と組み合わせロール。<br>銃火器Rは無し。自分のターンで1発のみ撃つ。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は命中時の期待ダメージの平均が高いものを優先。<br>特殊な武器は最下部の「自由記入枠」に手動で入れてください。",
     shock:c=>c.con*5, shockLabel:c=>"CON×5="+(c.con*5),
     db:(str,siz)=>{const t=str+siz;
       if(t<=12)return"-1d6"; if(t<=16)return"-1d4"; if(t<=24)return"0";
@@ -387,7 +428,7 @@ const SYS = {
   coc7:{
     name:"新クトゥルフ神話TRPG（7版）",
     cmd:"CC<=",
-    note:"<b>▼レギュレーション</b><br>判定は<b>CC</b>。<br><br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>ショックロール失敗、HP2以下で敗北。<br>近接戦闘を受けた時の対応は<b>キャラクターごとに「回避」か「応戦」</b>を設定（戦闘中に変更した場合は以降のターンから反映）。デフォルトは回避。<br>射撃・飛び道具に対しては常に<b>「身を隠す」</b>扱いで回避のみ。応戦は選べない。<br>射撃関連のルールが複雑であるため、一律で攻撃側平目、受動側は回避で処理。1R1発。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は抽選。<br>特殊な武器は最下部の「自由記入枠」に手動で入れてください。",
+    note:"<b>▼レギュレーション（ハウスルール）</b><br>判定は<b>CC</b>。<br><br><b>DEX同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>重症時のCONロール失敗、HP0以下で敗北。重症時の伏せ状態は適応なし。<br>近接戦闘を受けた時の対応は<b>キャラクターごとに「回避」か「応戦」</b>を設定（戦闘中に変更した場合は以降のターンから反映）。デフォルトは回避。<br>射撃・飛び道具に対しては常に<b>「身を隠す」</b>扱いで回避のみ。応戦は選べない。<br>射撃関連のルールが複雑であるため、一律で攻撃側平目、受動側は回避で処理。1R1発。<br>攻撃技能は最も技能値が高いものを使用、同値最上が複数ある場合は命中時の期待ダメージの平均が高いものを優先。<br>特殊な武器は最下部の「自由記入枠」に手動で入れてください。",
     shock:c=>c.con, shockLabel:c=>"CON="+c.con,
     db:(str,siz)=>{const t=str+siz;
       if(t<=64)return"-2"; if(t<=84)return"-1"; if(t<=124)return"0";
@@ -396,6 +437,12 @@ const SYS = {
   }
 };
 let sysKey="coc6";
+SYS.emo = {
+  name:"エモクロア／ガイアケア",
+  cmd:"DM<=",
+  note:"<b>▼レギュレーション（ハウスルール）</b><br>判定は<b>DM</b>。<br><b>イニシアチブ同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>攻撃技能は<b>ダイス数×目標値が最も高いもの</b>（同値ならダイス数が多い方）を使用、同値最上が複数ある場合は命中時の期待ダメージの平均が高いものを優先。<br>武器はプルダウン選択、自由記入の武器があればそちらを優先。<br>攻撃を受けた時の対応はキャラクターごとに「回避」か「防御」を設定。<br><b>回避</b>は〈＊運動〉〈スピード〉〈ストレングス〉〈アクロバット〉〈ダイブ〉〈危機察知〉のうち最も高いもの使用。同値なら〈危機察知〉優先。<br>回避は<b>1ラウンド1回</b>。〈危機察知〉で回避する場合はレベル回数まで。<br>回避しきれない攻撃は〈耐久〉があれば防御で受ける。<br><b>防御</b>は〈耐久〉が無いと選べない。<br>《融人》のルールは準備中（現在は人間と同じ処理）。",
+  shock:()=>0, shockLabel:()=>"", db:()=>"0"
+};
 const sys = ()=>SYS[sysKey];
 
 /* ---------- attacks ---------- */
@@ -469,6 +516,120 @@ function matchSkill(raw){
 }
 
 /* ---------- character model ---------- */
+/* ============================================================
+   エモクロア／ガイアケア：データ定義
+   ============================================================ */
+const EMO_SLOTS=[
+  {k:"kakutou",  n:"＊格闘",       grp:"atk",   dmg:3},
+  {k:"bujutsu",  n:"武術",         grp:"atk",   dmg:3, named:true},
+  {k:"ougi",     n:"奥義",         grp:"atk",   dmg:6, named:true},
+  {k:"touteki",  n:"＊投擲",       grp:"atk",   dmg:0},
+  {k:"shageki",  n:"射撃",         grp:"atk",   dmg:0, named:true},
+  {k:"undou",    n:"＊運動",       grp:"dodge"},
+  {k:"speed",    n:"スピード",     grp:"dodge"},
+  {k:"strength", n:"ストレングス", grp:"dodge"},
+  {k:"acro",     n:"アクロバット", grp:"dodge"},
+  {k:"dive",     n:"ダイブ",       grp:"dodge"},
+  {k:"kiki",     n:"危機察知",     grp:"dodge"},
+  {k:"taikyu",   n:"耐久",         grp:"guard"},
+  {k:"konjou",   n:"根性",         grp:"life"},
+  {k:"seizon",   n:"＊生存",       grp:"life"}
+];
+const EMO_WEAPONS=[
+  {id:"e_body",     n:"エモクロア・肉体",         p:"1"},
+  {id:"e_stick",    n:"エモクロア・手近な棒",     p:"2"},
+  {id:"e_knife",    n:"エモクロア・ナイフ",       p:"1D3"},
+  {id:"e_club",     n:"エモクロア・棍棒",         p:"2"},
+  {id:"e_sword",    n:"エモクロア・刀剣",         p:"1D6"},
+  {id:"e_stone",    n:"エモクロア・石",           p:"2"},
+  {id:"e_shot",     n:"エモクロア・砲丸",         p:"4"},
+  {id:"e_molotov",  n:"エモクロア・火炎瓶",       p:"1D6"},
+  {id:"e_grenade",  n:"エモクロア・手榴弾",       p:"2D6"},
+  {id:"e_pistol",   n:"エモクロア・拳銃",         p:"2D6"},
+  {id:"e_rifle",    n:"エモクロア・ライフル",     p:"3D6"},
+  {id:"e_bow",      n:"エモクロア・弓矢",         p:"1D10"},
+  {id:"g_fist",     n:"ガイアケア・素手",         p:"0"},
+  {id:"g_stick",    n:"ガイアケア・棒",           p:"1"},
+  {id:"g_staff",    n:"ガイアケア・杖",           p:"1D2"},
+  {id:"g_knife",    n:"ガイアケア・ナイフ",       p:"1D2"},
+  {id:"g_sword",    n:"ガイアケア・刀剣",         p:"1D4"},
+  {id:"g_spear",    n:"ガイアケア・槍",           p:"1D6"},
+  {id:"g_blackjack",n:"ガイアケア・ブラックジャック", p:"1D4"},
+  {id:"g_yujin",    n:"ガイアケア・変貌した《融人》の肉体", p:"1D[成功数]"},
+  {id:"g_stone",    n:"ガイアケア・投石",         p:"1"},
+  {id:"g_shot",     n:"ガイアケア・砲丸",         p:"1D3"},
+  {id:"g_shuriken", n:"ガイアケア・手裏剣",       p:"1D3"},
+  {id:"g_bow",      n:"ガイアケア・弓矢",         p:"1D6"},
+  {id:"g_molotov",  n:"ガイアケア・火炎瓶",       p:"1D6"},
+  {id:"g_grenade",  n:"ガイアケア・手榴弾",       p:"2D6"},
+  {id:"g_handgun",  n:"ガイアケア・ハンドガン",   p:"1D6"},
+  {id:"g_shotgun",  n:"ガイアケア・散弾銃",       p:"2D4"},
+  {id:"g_rifle",    n:"ガイアケア・ライフル",     p:"2D6"},
+  {id:"g_smg",      n:"ガイアケア・サブマシンガン", p:"5D4"}
+];
+function emoBlank(){
+  const sk={}; EMO_SLOTS.forEach(sl=>{ sk[sl.k]={n:0,t:0,name:""}; });
+  return {init:5, kind:"human", weapon:"e_body", freeWpnName:"", freeWpnDmg:"", defMode:"dodge", sk:sk};
+}
+/** 技能名 → スロット（〈奥義（徒手空拳）〉〈★奥義：居合〉などの表記ゆれに対応） */
+function emoSlotOf(raw){
+  const t=String(raw||"").replace(/[〈〉\s　★☆]/g,"").replace(/\*/g,"＊").replace(/\(/g,"（").replace(/\)/g,"）");
+  const m=t.match(/^(武術|奥義|射撃)[：:]?(?:（(.*)）|(.*))$/);
+  if(m) return {k:{"武術":"bujutsu","奥義":"ougi","射撃":"shageki"}[m[1]], name:(m[2]||m[3]||"").trim()};
+  const fixed={"＊格闘":"kakutou","格闘":"kakutou","＊投擲":"touteki","投擲":"touteki","＊運動":"undou","運動":"undou",
+    "スピード":"speed","ストレングス":"strength","アクロバット":"acro","ダイブ":"dive","危機察知":"kiki",
+    "耐久":"taikyu","根性":"konjou","＊生存":"seizon","生存":"seizon"};
+  return fixed[t] ? {k:fixed[t], name:""} : null;
+}
+/** 技能の強さ：ダイス数×目標値（同値ならダイス数が多い方をわずかに上に） */
+function emoPow(sl){ return (sl && sl.n>0 && sl.t>0) ? sl.n*sl.t*1000 + sl.n : 0; }
+function emoSkillLabel(slot,sl){ return slot.named ? `${slot.n}${sl&&sl.name?`（${sl.name}）`:""}` : slot.n; }
+function emoWeapon(id){ return EMO_WEAPONS.find(w=>w.id===id) || EMO_WEAPONS[0]; }
+const RE_SUCC=/[\[［]成功数[\]］]/g;
+/** 自由記入の武器ダメージが使える書式か（[成功数] は仮に1を入れて確認） */
+function emoFreeValid(e){
+  const t=String(e.freeWpnDmg||"").trim();
+  if(!t) return false;
+  const x=t.replace(RE_SUCC,"1");
+  if(!/^[0-9０-９dDｄＤ+\-＋－\s]+$/.test(x)) return false;
+  return parseExpr(x).length>0;
+}
+/** 実際に使う武器（自由記入が有効ならそちらを優先） */
+function emoActiveWeapon(c){
+  const e=c.emo;
+  if(emoFreeValid(e)) return {n:(e.freeWpnName||"").trim()||"自由記入の武器", p:String(e.freeWpnDmg).trim(), free:true};
+  return emoWeapon(e.weapon);
+}
+function emoFreeNote(e){
+  const on=emoFreeValid(e), bad=!!String(e.freeWpnDmg||"").trim() && !on;
+  return {on:on, bad:bad,
+    text: on ? `「${(e.freeWpnName||"").trim()||"自由記入の武器"}」で攻撃します（上の武器より優先）`
+        : bad ? "ダメージの書式が読み取れません。例：1D4+1、[成功数]D3"
+        : "記入すると上の武器より優先して使います。ダメージに [成功数] と書くと、その攻撃の成功数が入ります。"};
+}
+function esc(v){ return String(v==null?"":v).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch])); }
+/* エモクロア／ガイアケアのサンプル（例示用の数値です） */
+function sampleEA(){
+  const c=blank("キャラクターA","#C9A227");
+  c.hp=14; Object.assign(c.emo,{init:7, weapon:"e_body"});
+  Object.assign(c.emo.sk.ougi,   {n:2,t:8,name:"徒手空拳"});
+  Object.assign(c.emo.sk.kakutou,{n:1,t:6});
+  Object.assign(c.emo.sk.speed,  {n:2,t:7});
+  Object.assign(c.emo.sk.seizon, {n:1,t:5});
+  Object.assign(c.emo.sk.konjou, {n:1,t:6});
+  return c;
+}
+function sampleEB(){
+  const c=blank("キャラクターB","#4E8FC7");
+  c.hp=16; Object.assign(c.emo,{init:6, weapon:"e_knife"});
+  Object.assign(c.emo.sk.kakutou,{n:1,t:6});
+  Object.assign(c.emo.sk.kiki,   {n:2,t:8});
+  Object.assign(c.emo.sk.taikyu, {n:2,t:6});
+  Object.assign(c.emo.sk.seizon, {n:1,t:6});
+  Object.assign(c.emo.sk.konjou, {n:2,t:7});
+  return c;
+}
+
 function blank(name,color){
   const c={name:name,hp:10,con:10,dex:10,db:"0",dodge:30,img:null,color:color||"#C9A227",
            freeName:"",freeImpale:false,freeKind:"melee",freeDB:false,freeHalfDB:false,dbSrc:"",defMode:"dodge",skills:{},wpn:{}};
@@ -476,6 +637,7 @@ function blank(name,color){
   ATK7.forEach(a=>{ if(a.wpn!==undefined) c.wpn[a.k]=a.wpn; });   /* 7版は仮の武器ダメージを入れておく */
   MA.forEach(a=>c.skills[a.k]=0);
   c.skills.free=0; c.wpn.free="";
+  c.emo=emoBlank();
   return c;
 }
 /** 自由記入枠を攻撃として扱う */
@@ -566,7 +728,91 @@ function stick(color){
   <circle cx="30" cy="14" r="10" fill="none"/><path d="M30 24 V60"/><path d="M30 32 L12 46"/><path d="M30 32 L48 46"/>
   <path d="M30 60 L16 92"/><path d="M30 60 L44 92"/></svg>`;
 }
+/* エモクロア／ガイアケアの入力パネル */
+function panelEmo(i){
+  const c=PC[i], e=c.emo, side=i===0?"A":"B";
+  const pal = PALETTE.map(h=>`<button type="button" data-setcol="${i}" data-col="${h}" style="background:${h}" title="${h}" aria-label="色 ${h}"></button>`).join("");
+  const hasGuard = emoPow(e.sk.taikyu)>0;
+  const row = slot=>{
+    const sl=e.sk[slot.k], off=!(sl.n>0&&sl.t>0);
+    const label = slot.named
+      ? `<span class="esn"><i>${slot.n}</i><input type="text" class="esname" data-i="${i}" data-es="${slot.k}" data-part="name" value="${esc(sl.name)}" placeholder="名前" aria-label="${slot.n}の名前"></span>`
+      : `<span>${slot.n}</span>`;
+    return `<div class="esk ${off?"off":""}">${label}
+      <input type="number" min="0" max="20" data-i="${i}" data-es="${slot.k}" data-part="n" value="${sl.n}" aria-label="${slot.n}のダイス数">
+      <em>DM&lt;=</em>
+      <input type="number" min="0" max="10" data-i="${i}" data-es="${slot.k}" data-part="t" value="${sl.t}" aria-label="${slot.n}の目標値"></div>`;
+  };
+  const grp = g=>EMO_SLOTS.filter(sl=>sl.grp===g).map(row).join("");
+  const wopts = EMO_WEAPONS.map(w=>`<option value="${w.id}"${w.id===e.weapon?" selected":""}>${w.n}（${w.p}）</option>`).join("");
+  return `<section class="card ${i?"b":""}">
+    <header>
+      <button type="button" class="tagbtn" data-pal="${i}" style="background:${c.color};color:${readable(c.color)}"
+        title="棒人間の色を選ぶ" aria-haspopup="true" aria-expanded="false">${side}</button>
+      <input type="text" data-i="${i}" data-f="name" value="${esc(c.name)}" aria-label="キャラクター名">
+      <div class="pal" id="pal${i}" hidden>${pal}</div>
+    </header>
+    <div class="body">
+      <div class="row-io">
+        <button class="ghost" data-import="${i}">キャラコマデータを読み込む</button>
+        <button class="ghost" data-clear="${i}">空にする</button>
+      </div>
+      <div class="port">
+        <div class="thumb" id="th${i}">${c.img?`<img src="${c.img}" alt="">`:stick(c.color)}</div>
+        <div><label for="fi${i}">立ち絵（画像ファイル・任意）</label><input id="fi${i}" type="file" accept="image/*" data-img="${i}"></div>
+      </div>
+      <div class="stats emo">
+        <div><label>HP</label><input type="number" data-i="${i}" data-f="hp" value="${c.hp}"></div>
+        <div><label>イニシアチブ</label><input type="number" data-i="${i}" data-ef="init" value="${e.init}"></div>
+        <div><label>種別</label><select data-i="${i}" data-ef="kind" aria-label="種別">
+          <option value="human"${e.kind!=="yujin"?" selected":""}>人間</option>
+          <option value="yujin"${e.kind==="yujin"?" selected":""}>融人</option></select></div>
+      </div>
+      ${e.kind==="yujin"?`<p class="yujin-note">《融人》のルールは準備中のため、現在は人間と同じ処理で戦います。</p>`:""}
+      <div class="ewpn ${emoFreeNote(e).on?"overridden":""}" data-wsel="${i}"><label>武器</label><select data-i="${i}" data-ef="weapon" aria-label="武器">${wopts}</select></div>
+      <div class="ewfree" data-wfree="${i}">
+        <label>自由記入の武器</label>
+        <div class="ewrow">
+          <input type="text" data-i="${i}" data-ef="freeWpnName" value="${esc(e.freeWpnName)}" placeholder="名前" aria-label="自由記入の武器の名前">
+          <input type="text" data-i="${i}" data-ef="freeWpnDmg" value="${esc(e.freeWpnDmg)}" placeholder="例：1D4+1、[成功数]D3" aria-label="自由記入の武器のダメージ">
+        </div>
+        <p class="ewnote ${emoFreeNote(e).on?"on":""} ${emoFreeNote(e).bad?"bad":""}">${emoFreeNote(e).text}</p>
+      </div>
+      <div class="skills">
+        <h4>攻 撃 技 能</h4>
+        ${grp("atk")}
+        <h4 style="margin-top:14px">回 避 ・ 防 御</h4>
+        <div class="sk defrow"><span>攻撃を受けた時</span>
+          <select data-i="${i}" data-ef="defMode" aria-label="攻撃を受けた時の対応">
+            <option value="dodge"${e.defMode!=="guard"||!hasGuard?" selected":""}>回避する</option>
+            <option value="guard"${e.defMode==="guard"&&hasGuard?" selected":""}${hasGuard?"":" disabled"}>${hasGuard?"防御する":"防御する（〈耐久〉なし）"}</option>
+          </select></div>
+        ${grp("dodge")}
+        ${grp("guard")}
+        <h4 style="margin-top:14px">心 肺 停 止 ・ 気 絶</h4>
+        ${grp("life")}
+      </div>
+    </div>
+  </section>`;
+}
+/** 自由記入の武器の状態をパネルに反映（再描画せずに更新して入力中のフォーカスを保つ） */
+function syncWpnOverride(i){
+  const e=PC[i].emo, st=emoFreeNote(e);
+  const sel=field.querySelector(`.ewpn[data-wsel="${i}"]`), note=field.querySelector(`[data-wfree="${i}"] .ewnote`);
+  if(sel) sel.classList.toggle("overridden", st.on);
+  if(note){ note.textContent=st.text; note.classList.toggle("on",st.on); note.classList.toggle("bad",st.bad); }
+}
+/** 〈耐久〉の有無に合わせて「防御する」の選択可否を更新 */
+function syncGuardOption(i){
+  const e=PC[i].emo, ok=emoPow(e.sk.taikyu)>0;
+  const sel=field.querySelector(`select[data-i="${i}"][data-ef="defMode"]`); if(!sel) return;
+  const opt=sel.querySelector('option[value="guard"]');
+  opt.disabled=!ok; opt.textContent= ok ? "防御する" : "防御する（〈耐久〉なし）";
+  if(!ok && e.defMode==="guard"){ e.defMode="dodge"; sel.value="dodge"; }
+}
+
 function panel(i){
+  if(sysKey==="emo") return panelEmo(i);
   const c=PC[i], side=i===0?"A":"B";
   const skRows = atks().concat(sysKey==="coc6"?MA:[]).map(a=>{
     const v=c.skills[a.k]||0;
@@ -651,6 +897,20 @@ function refreshGauges(){
 field.addEventListener("input",e=>{
   const t=e.target, i=+t.dataset.i;
   pristine=false;
+  if(t.dataset.es){
+    const sl=PC[i].emo.sk[t.dataset.es], part=t.dataset.part;
+    sl[part] = part==="name" ? t.value : Math.max(0,parseInt(t.value,10)||0);
+    const row=t.closest(".esk"); if(row) row.classList.toggle("off", !(sl.n>0&&sl.t>0));
+    if(t.dataset.es==="taikyu") syncGuardOption(i);
+    return;
+  }
+  if(t.dataset.ef){
+    const f=t.dataset.ef;
+    PC[i].emo[f] = f==="init" ? (parseInt(t.value,10)||0) : t.value;
+    if(f==="kind") renderField();
+    if(f==="freeWpnName"||f==="freeWpnDmg") syncWpnOverride(i);
+    return;
+  }
   if(t.dataset.f){
     const f=t.dataset.f;
     if(t.type==="checkbox"){
@@ -730,8 +990,8 @@ document.querySelectorAll(".sysbtn").forEach(b=>b.addEventListener("click",()=>{
   sysKey=b.dataset.sys;
   setNote(sys().note);
   if(pristine){
-    PC[0] = sysKey==="coc7" ? sample7A() : sampleA();
-    PC[1] = sysKey==="coc7" ? sample7B() : sampleB();
+    PC[0] = sysKey==="coc7" ? sample7A() : sysKey==="emo" ? sampleEA() : sampleA();
+    PC[1] = sysKey==="coc7" ? sample7B() : sysKey==="emo" ? sampleEB() : sampleB();
   }
   renderField(); refreshGauges();
 }));
@@ -741,7 +1001,12 @@ setNote(SYS.coc6.note);
    シート読み込み
    ============================================================ */
 const dlg=document.getElementById("dlg"); let importTarget=0;
-function openImport(i){ importTarget=i; setStatus(""); dlg.showModal(); }
+function openImport(i){
+  importTarget=i; setStatus("");
+  document.getElementById("helpCoc").hidden = sysKey==="emo";
+  document.getElementById("helpEmo").hidden = sysKey!=="emo";
+  dlg.showModal();
+}
 function setStatus(msg,cls){ const s=document.getElementById("dlgStatus"); s.textContent=msg||""; s.className="status "+(cls||""); }
 document.getElementById("dlgClose").onclick=()=>dlg.close();
 
@@ -834,7 +1099,38 @@ function fromCharasheetText(t,c){
 }
 
 /** JSON / ココフォリア / プレーンテキストを許容するゆるいパーサ */
+/** キャラッシュ「CCFOLIA駒形式でコピー」のデータを読む */
+function importEmo(raw,i){
+  const prev=PC[i];
+  const c=blank(prev.name, prev.color);
+  c.img=prev.img; c.emo.kind=prev.emo.kind; c.emo.defMode=prev.emo.defMode; c.emo.weapon=prev.emo.weapon;
+  c.emo.freeWpnName=prev.emo.freeWpnName||""; c.emo.freeWpnDmg=prev.emo.freeWpnDmg||"";
+  let obj=null; try{ obj=JSON.parse(String(raw).trim()); }catch(err){ obj=null; }
+  const dat = obj && typeof obj==="object" ? (obj.data||obj) : null;
+  let text=String(raw), found=0;
+  if(dat){
+    if(dat.name) c.name=String(dat.name);
+    if(dat.initiative!=null && !isNaN(+dat.initiative)){ c.emo.init=+dat.initiative; found++; }
+    (dat.status||[]).forEach(st=>{ if(String(st.label||"").toUpperCase()==="HP"){ c.hp=+(st.max||st.value)||c.hp; found++; } });
+    if(dat.commands) text=String(dat.commands);
+    const url=String(dat.externalUrl||"");
+    if(/gaiacare/i.test(url) && !/^g_/.test(c.emo.weapon)) c.emo.weapon="g_fist";
+    if(/emoklore/i.test(url) && !/^e_/.test(c.emo.weapon)) c.emo.weapon="e_body";
+  }
+  const re=/(\d+)\s*DM\s*<=\s*(\d+)\s*〈([^〉]+)〉/g; let m;
+  while((m=re.exec(text))!==null){
+    const hit=emoSlotOf(m[3]); if(!hit) continue;
+    const cand={n:+m[1], t:+m[2], name:hit.name};
+    const cur=c.emo.sk[hit.k];
+    if(emoPow(cand)>emoPow(cur)){ Object.assign(cur,cand); }
+    found++;
+  }
+  if(emoPow(c.emo.sk.taikyu)<=0) c.emo.defMode="dodge";
+  return found ? c : null;
+}
+
 function importData(raw,i){
+  if(sysKey==="emo") return importEmo(raw,i);
   const c = blank(PC[i].name, PC[i].color);
   c.img = PC[i].img;
   c.freeName = PC[i].freeName; c.wpn.free = PC[i].wpn.free; c.skills.free = PC[i].skills.free;
@@ -1017,9 +1313,22 @@ document.getElementById("dlgParse").onclick=()=>{
   const c=importData(raw,importTarget);
   if(!c) return setStatus("読み取れる項目が見つかりませんでした。別の出力形式（ココフォリア出力が最も確実です）をお試しください。","ng");
   PC[importTarget]=c; pristine=false; renderField(); refreshGauges();
+  if(sysKey==="emo"){
+    const e=c.emo, atkN=EMO_SLOTS.filter(sl=>sl.grp==="atk"&&emoPow(e.sk[sl.k])>0).length;
+    return setStatus(`「${c.name}」を反映しました（HP ${c.hp} / イニシアチブ ${e.init} / 攻撃技能 ${atkN} 件${emoPow(e.sk.taikyu)>0?"":" / 〈耐久〉なし"}）。武器と種別を選び、数値をご確認ください。`,"ok");
+  }
   const got=Object.values(c.skills).filter(v=>v>0).length;
   setStatus(`「${c.name}」を反映しました（戦闘技能 ${got} 件 / HP ${c.hp} / CON ${c.con} / DEX ${c.dex} / DB ${c.db}）。数値をご確認ください。`,"ok");
 };
+/** ログの名前をキャラクターの色で表示（暗い色は背景色つきで読みやすく） */
+function nameTag(i,name){
+  const c=(PC[i]&&PC[i].color)||(i?"#4E8FC7":"#C9A227");
+  const r=parseInt(c.substr(1,2),16), g=parseInt(c.substr(3,2),16), b=parseInt(c.substr(5,2),16);
+  const lum=(r*299+g*587+b*114)/1000;
+  return lum<80
+    ? `<span class="nm-chip" style="background:${c}">${esc(name)}</span>`
+    : `<span style="color:${c}">${esc(name)}</span>`;
+}
 /* ============================================================
    戦闘エンジン
    ============================================================ */
@@ -1057,6 +1366,8 @@ function setHP(i,cur,max){
 async function showDice(val,side){
   if(SPEED===0) return;
   const box=document.getElementById("dice"+(side===1?1:0));
+  const drow=box.querySelector(".dicerow"); drow.className="dicerow";
+  drow.innerHTML='<span class="die tens">00</span><span class="die ones">0</span>';
   const tens=box.querySelector(".tens"), ones=box.querySelector(".ones"), res=box.querySelector(".dieres");
   const t=(val>=100?0:Math.floor(val/10)*10), o=val%10;
   res.classList.remove("on"); res.textContent="";
@@ -1070,6 +1381,25 @@ async function showDice(val,side){
   tens.classList.remove("tumble"); ones.classList.remove("tumble");
   tens.textContent=String(t).padStart(2,"0"); ones.textContent=o;
   res.textContent="＝ "+val; res.classList.add("on");
+  await sleep(430);
+  box.classList.remove("on");
+}
+
+/** D10を複数個振る演出（エモクロア／ガイアケア用。すべて青いダイス） */
+async function showDiceN(vals,side,resText){
+  if(SPEED===0) return;
+  const box=document.getElementById("dice"+(side===1?1:0));
+  const row=box.querySelector(".dicerow"), res=box.querySelector(".dieres");
+  row.className="dicerow"+(vals.length>3?" many":"");
+  row.innerHTML=vals.map(()=>'<span class="die ones">0</span>').join("");
+  const dice=[...row.children];
+  res.classList.remove("on"); res.textContent="";
+  box.classList.add("on"); dice.forEach(x=>x.classList.add("tumble"));
+  const iv=setInterval(()=>dice.forEach(x=>{ x.textContent=d(10); }),70);
+  await sleep(460);
+  clearInterval(iv);
+  dice.forEach((x,k)=>{ x.classList.remove("tumble"); x.textContent=vals[k]; });
+  res.textContent=resText||""; res.classList.add("on");
   await sleep(430);
   box.classList.remove("on");
 }
@@ -1098,17 +1428,28 @@ function options(c){
   });
 }
 /** 技能値が最も高い攻撃を選ぶ（同値ならその中からランダム） */
+/** 式の期待値（1d6→3.5 など） */
+function avgTerms(terms){ return terms.reduce((a,t)=>a + t.sign*(t.t==="d" ? t.n*(t.f+1)/2 : t.v), 0); }
+/** 命中時の期待ダメージ（攻撃技能の比較用） */
+function avgDmgCoC(c,a){
+  const base = a.wpn!==undefined ? parseExpr(c.wpn[a.k]) : parseExpr(a.dice);
+  const db = avgTerms(parseExpr(c.db));
+  return avgTerms(base) + (a.db==="full" ? db : a.db==="half" ? db/2 : 0);
+}
+/** 技能値が最も高い攻撃を選ぶ。同値が複数あれば命中時の期待ダメージが大きいもの、それも同じなら抽選 */
 function chooseAttack(c){
   const o=options(c);
   if(!o.length) return null;
   const top=Math.max.apply(null, o.map(a=>c.skills[a.k]));
-  const best=o.filter(a=>c.skills[a.k]===top);
+  let best=o.filter(a=>c.skills[a.k]===top);
+  const dm=best.map(a=>avgDmgCoC(c,a)), mx=Math.max.apply(null, dm);
+  best=best.filter((a,k)=>Math.abs(dm[k]-mx)<1e-9);
   return best[Math.floor(Math.random()*best.length)];
 }
 
 async function turn(atk,def,ai,di,state){
   const A=atk.name, D=def.name;
-  put("l-turn", `${A}のターン！`);
+  put("l-turn", `${nameTag(ai,A)}のターン！`);
   await sleep(320);
   if(atk.skipTurn){
     atk.skipTurn=false;
@@ -1212,21 +1553,26 @@ async function turn(atk,def,ai,di,state){
 
 /** ダメージ適用・ノックアウト判定・ショックロール（6版／7版 共通） */
 async function applyDamage(v,vi,dmg,state,srcName){
+  const before=v.cur;
   v.cur -= dmg;
   setHP(vi, v.cur, v.max);
   await sleep(420);
   const D=v.name, A=srcName;
-  /* --- HP2以下で即ノックアウト --- */
-  if(v.cur<=2){
+  /* --- 即ノックアウト：6版はHP2以下、7版はHP0以下 --- */
+  if(v.cur <= (sysKey==="coc7" ? 0 : 2)){
     put("l-kill", fill(pick(F_LOW),D,A));
     put("l-sys", `${D}のHPは${Math.max(0,v.cur)}。行動不能——ノックアウト！`);
     state.ko=vi; return true;
   }
-  /* --- ショックロール（現在HPが最大の半分以下になったとき1回） --- */
-  if(!v.shocked && v.cur <= Math.floor(v.max/2)){
-    v.shocked=true;
+  /* --- ショックロール（いずれも条件を満たせば何度でも発生） ---
+     6版：一度の攻撃で、被弾前のHPの半分以上を失ったとき
+     7版：一度の攻撃で、最大HPの半分以上のダメージを受けたとき（重傷） */
+  const shock = sysKey==="coc6" ? dmg*2 >= before : dmg*2 >= v.max;
+  if(shock){
     const t=sys().shock(v), sr = sysKey==="coc7" ? roll7(t) : skillRoll(t);
-    put("l-sys", `${D}のHPが半分を割った——ショックロール発生！`);
+    put("l-sys", sysKey==="coc6"
+      ? `${D}は一度に現在HPの半分以上を失った——ショックロール発生！`
+      : `${D}は重傷を負った（一度に最大HPの半分以上）——ショックロール発生！`);
     await sleep(240);
     await showDice(sr.r, vi);
     put("l-roll", `${sys().cmd}${t}（${sys().shockLabel(v)}） ⇒ ${sr.r} ${sr.ok?'<b class="s">成功！</b>':'<b class="f">失敗！</b>'}`);
@@ -1296,7 +1642,7 @@ function dmg7calc(ch,a,lv){
 function defModeOf(i){ return (PC[i] && PC[i].defMode==="fight") ? "fight" : "dodge"; }
 async function turn7(atk,def,ai,di,state){
   const A=atk.name, D=def.name;
-  put("l-turn", `${A}のターン！`);
+  put("l-turn", `${nameTag(ai,A)}のターン！`);
   await sleep(320);
   const a=chooseAttack(atk);
   if(!a){
@@ -1379,6 +1725,232 @@ function fmtParts(b,db){
   return seg.join(" / ");
 }
 
+/* ============================================================
+   エモクロア／ガイアケア：戦闘
+   ============================================================ */
+/** nDM<=t：1=成功数2、2〜目標値=1、目標値超過=0、10=-1 */
+function emoRoll(n,t){
+  const dice=[]; let succ=0;
+  for(let k=0;k<n;k++){
+    const v=d(10); dice.push(v);
+    if(v===10) succ-=1;
+    else if(v===1) succ+=2;
+    else if(v<=t) succ+=1;
+  }
+  return {dice:dice, succ:succ, n:n, t:t};
+}
+const EMO_RANK={2:"ダブル",3:"トリプル"};
+function emoTag(r){
+  if(r.succ<=0) return `<b class="f">失敗（成功数${r.succ}）</b>`;
+  return `<b class="${r.succ>=2?"c":"s"}">成功数${r.succ}${EMO_RANK[r.succ]?`（${EMO_RANK[r.succ]}）`:""}</b>`;
+}
+function emoRollText(r){ return `${r.n}DM<=${r.t} ⇒ [${r.dice.join(", ")}]`; }
+function emoDefMode(i){ const e=PC[i]&&PC[i].emo; return (e && e.defMode==="guard" && emoPow(e.sk.taikyu)>0) ? "guard" : "dodge"; }
+function emoDefLabel(i){ return emoDefMode(i)==="guard" ? "防御" : "回避"; }
+/** 最も強い攻撃技能（同値はランダム） */
+function emoBestAttack(c){
+  const list=EMO_SLOTS.filter(sl=>sl.grp==="atk" && emoPow(c.emo.sk[sl.k])>0);
+  if(!list.length) return null;
+  const top=Math.max.apply(null, list.map(sl=>emoPow(c.emo.sk[sl.k])));
+  let best=list.filter(sl=>emoPow(c.emo.sk[sl.k])===top);
+  /* 同値なら命中時のダメージが大きいもの：成功数1あたり D6(3.5) ＞ D3(2) ＞ 成功数そのまま(1)。武器は共通なので比較から除外 */
+  const per=sl=> sl.dmg===6 ? 3.5 : sl.dmg===3 ? 2 : 1;
+  const mx=Math.max.apply(null, best.map(per));
+  best=best.filter(sl=>per(sl)===mx);
+  return best[Math.floor(Math.random()*best.length)];
+}
+/** 最も強い回避技能（ダイス数×目標値が同値なら〈危機察知〉を優先） */
+function emoBestDodge(c){
+  let best=null, bp=0;
+  EMO_SLOTS.filter(sl=>sl.grp==="dodge").forEach(sl=>{
+    const x=c.emo.sk[sl.k];
+    if(!(x.n>0&&x.t>0)) return;
+    const p=x.n*x.t*1000 + (sl.k==="kiki"?500:0) + x.n;
+    if(p>bp){ bp=p; best=sl; }
+  });
+  return best;
+}
+/** 気絶判定に使う技能（〈＊生存〉〈耐久〉〈根性〉で最も高いもの） */
+function emoBestLife(c){
+  let best=null, bp=0;
+  ["seizon","taikyu","konjou"].forEach(k=>{
+    const p=emoPow(c.emo.sk[k]);
+    if(p>bp){ bp=p; best=EMO_SLOTS.find(sl=>sl.k===k); }
+  });
+  return best;
+}
+/** ダメージ算出 */
+function emoDamage(atk,slot,succ){
+  const w=emoActiveWeapon(atk);
+  let total=0; const lab=[], det=[];
+  if(slot.dmg>0){
+    const r=rollTerms([{t:"d",sign:1,n:succ,f:slot.dmg}]);
+    total+=r.total; lab.push(`${succ}D${slot.dmg}`);
+    det.push(`${succ}D${slot.dmg}:${r.parts[0].rolls.join("+")}`);
+  }else{
+    total+=succ; lab.push(`成功数${succ}`);
+  }
+  const wexpr = String(w.p).replace(RE_SUCC, String(Math.max(1,succ)));
+  const wt=parseExpr(wexpr), wr=rollTerms(wt);
+  if(wt.length && !(wt.length===1 && wt[0].t==="c" && wt[0].v===0)){
+    total+=wr.total;
+    lab.push(exprLabel(wt).toUpperCase());
+    wr.parts.forEach(pt=>{ if(pt.rolls) det.push(`武器${pt.label.toUpperCase()}:${pt.rolls.join("+")}`); });
+  }
+  return {dmg:Math.max(0,total), label:lab.join("＋"), detail:det.join(" / ")};
+}
+const F_OUGI=["{A}の奥義が冴え渡る——狙いは{D}！","研ぎ澄まされた一撃。{A}の奥義が{D}を捉えにいく！","{A}は全身の力を一点に集め、奥義を放った！"];
+const F_OUGI_CHAIN=["勢いは止まらない——{A}はそのまま追撃に移る！","返す一手で、{A}の奥義がもう一度閃く！"];
+const F_GUARD=["{D}は身を固め、衝撃を正面から受け止めにいく！","{D}は腕を交差させ、真っ向から受ける構えだ！"];
+const F_GUTS_OK=["止まりかけた鼓動が、もう一度強く打った。{A}はまだ倒れない！","歯を食いしばり、{A}はぎりぎりで踏みとどまった！"];
+const F_ARREST=["{A}の胸の奥で、何かが静かに止まった。","{A}の体から力が抜け、床に崩れ落ちる。"];
+const EMO_FLAV={kakutou:FLAV.punch, bujutsu:FLAV.kick, ougi:F_OUGI, touteki:FLAV.throw, shageki:FLAV.handgun};
+
+async function emoAttack(atk,def,ai,di,state,slot,isExtra){
+  const A=atk.name, D=def.name, sl=atk.emo.sk[slot.k];
+  const nm=emoSkillLabel(slot,sl), ex=isExtra?"（追加攻撃）":"";
+  put("l-roll", `${A}の〈${nm}〉${ex}！　${sl.n}DM<=${sl.t} ⇒ <span>?</span>`);
+  const line=logEl.lastElementChild;
+  const ra=emoRoll(sl.n,sl.t);
+  await showDiceN(ra.dice, ai, `成功数 ${ra.succ}`);
+  line.innerHTML=`${A}の〈${nm}〉${ex}！　${emoRollText(ra)} ${emoTag(ra)}`;
+  await sleep(200);
+  const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
+  put("l-flav", fill(pick(ra.succ>0 ? (EMO_FLAV[slot.k]||F_FREE) : F_MISS),A,D).replace(/\{S\}/g,nm));
+  fx(fa, ai===0?"lungeR":"lungeL", 420);
+  if(ra.succ<=0){
+    put("l-sys", `攻撃が届いていないため、${D}は${emoDefLabel(di)}を行わない。`);
+    await sleep(520); return ra;
+  }
+
+  /* --- 防御側の対応 --- */
+  const hasGuard=emoPow(def.emo.sk.taikyu)>0;
+  let mode=emoDefMode(di);
+  if(mode==="guard" && !hasGuard) mode="dodge";
+  let reduce=0;
+  if(mode==="dodge"){
+    const ds=emoBestDodge(def), dsl=ds?def.emo.sk[ds.k]:null;
+    const maxD = ds ? ((ds.k==="kiki" && dsl.n>=2) ? dsl.n : 1) : 0;
+    if(ds && def.dodgeUsed<maxD){
+      def.dodgeUsed++;
+      await sleep(260);
+      const rd=emoRoll(dsl.n,dsl.t);
+      await showDiceN(rd.dice, di, `成功数 ${rd.succ}`);
+      put("l-roll", `${D}の回避〈${ds.n}〉！　${emoRollText(rd)} ${emoTag(rd)}${maxD>1?`　<span style="color:#5B677C">（このラウンド ${def.dodgeUsed}/${maxD} 回目）</span>`:""}`);
+      await sleep(240);
+      if(rd.succ>=ra.succ){
+        put("l-flav", fill(pick(F_DODGE_OK),A,D));
+        fx(fd, di===0?"dodgeL":"dodgeR", 420); popup(di,"MISS","miss");
+        await sleep(560); return ra;
+      }
+      put("l-flav", fill(pick(F_DODGE_NG),A,D));
+    }else{
+      await sleep(200);
+      const why = ds ? `${D}はこのラウンドの回避を使い切っている` : `${D}には回避に使える技能がない`;
+      if(hasGuard){ put("l-sys", `${why}——防御で受ける！`); mode="guard"; }
+      else put("l-sys", `${why}。防ぐ術がない！`);
+    }
+  }
+  if(mode==="guard"){
+    const g=def.emo.sk.taikyu;
+    await sleep(240);
+    put("l-flav", fill(pick(F_GUARD),A,D));
+    const rg=emoRoll(g.n,g.t);
+    await showDiceN(rg.dice, di, `成功数 ${rg.succ}`);
+    put("l-roll", `${D}の防御〈耐久〉！　${emoRollText(rg)} ${emoTag(rg)}`);
+    reduce=Math.max(0,rg.succ);
+  }
+
+  /* --- ダメージ --- */
+  const r=emoDamage(atk,slot,ra.succ);
+  await sleep(280);
+  put("l-roll", `${r.label} ⇒ ${r.dmg}${r.detail?`　<span style="color:#5B677C">（${r.detail}）</span>`:""}`);
+  const fin=Math.max(0, r.dmg-reduce);
+  if(mode==="guard") put("l-sys", `〈耐久〉で${reduce}軽減——${r.dmg} − ${reduce} ＝ ${fin}`);
+  if(fin<=0){
+    put("l-flav", `${D}は衝撃を完全に受け止めた！`);
+    popup(di,"0","miss"); await sleep(520); return ra;
+  }
+  put("l-dmg", `${fin}のダメージ！`);
+  fx(fd,"hitshake",340); popup(di,"-"+fin);
+  const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
+  await applyDamageEmo(def,di,fin,state,A);
+  return ra;
+}
+
+/** ダメージ適用：心肺停止（〈根性〉）→ 気絶判定 */
+async function applyDamageEmo(v,vi,dmg,state,srcName){
+  const before=v.cur, D=v.name, A=srcName;
+  v.cur-=dmg; setHP(vi,v.cur,v.max);
+  await sleep(420);
+  /* --- 心肺停止 --- */
+  if(v.cur<=0){
+    put("l-sys", `${D}のHPが${v.cur}に——【心肺停止】の危機！`);
+    const k=v.emo.sk.konjou;
+    if(k.n>0 && k.t>0){
+      await sleep(260);
+      const rk=emoRoll(k.n,k.t);
+      await showDiceN(rk.dice, vi, `成功数 ${rk.succ}`);
+      put("l-roll", `${D}の〈根性〉！　${emoRollText(rk)} ${emoTag(rk)}`);
+      k.n=Math.max(0,k.n-1); k.t=Math.max(0,k.t-1);
+      put("l-sys", k.n>0&&k.t>0 ? `〈根性〉のレベルが下がった（以降 ${k.n}DM<=${k.t}）` : `〈根性〉はもう使えない。`);
+      await sleep(240);
+      if(rk.succ>0){
+        v.cur=1; setHP(vi,1,v.max);
+        put("l-flav", fill(pick(F_GUTS_OK),D,A));
+        return false;   /* 〈根性〉で踏みとどまったら気絶判定は行わず、戦闘続行 */
+      }else{
+        put("l-kill", fill(pick(F_ARREST),D,A));
+        put("l-sys", `${D}は【心肺停止】——ノックアウト！`);
+        state.ko=vi; return true;
+      }
+    }else{
+      put("l-kill", fill(pick(F_ARREST),D,A));
+      put("l-sys", `〈根性〉を持たない${D}は【心肺停止】——ノックアウト！`);
+      state.ko=vi; return true;
+    }
+  }
+  /* --- 気絶判定：一度に現在HPの半分以上を失った --- */
+  if(dmg*2>=before){
+    put("l-sys", `一度に現在HPの半分以上を失った——${D}の気絶判定！`);
+    const ls=emoBestLife(v);
+    await sleep(240);
+    if(!ls){
+      put("l-flav", fill(pick(F_SHOCK_NG),D,A));
+      put("l-sys", `判定に使える技能がない——${D}は【気絶】、ノックアウト！`);
+      state.ko=vi; return true;
+    }
+    const x=v.emo.sk[ls.k], rs=emoRoll(x.n,x.t);
+    await showDiceN(rs.dice, vi, `成功数 ${rs.succ}`);
+    put("l-roll", `${D}の〈${ls.n}〉！　${emoRollText(rs)} ${emoTag(rs)}`);
+    await sleep(240);
+    put("l-flav", fill(pick(rs.succ>0?F_SHOCK_OK:F_SHOCK_NG),D,A));
+    if(rs.succ<=0){ put("l-sys", `${D}は【気絶】——ノックアウト！`); state.ko=vi; return true; }
+  }
+  return false;
+}
+
+async function turnEmo(atk,def,ai,di,state){
+  const A=atk.name, D=def.name;
+  put("l-turn", `${nameTag(ai,A)}のターン！`);
+  await sleep(320);
+  const slot=emoBestAttack(atk);
+  if(!slot){
+    put("l-flav", `${A}には振るえる攻撃技能がない。ただ身構えるだけだ……`);
+    await sleep(500); return;
+  }
+  const ra=await emoAttack(atk,def,ai,di,state,slot,false);
+  /* 〈奥義〉がダブル以上なら、同じ相手へ追加攻撃（追加攻撃からの連撃は無し） */
+  if(slot.k==="ougi" && ra.succ>=2 && state.ko<0 && !abort){
+    await sleep(300);
+    put("l-sys", `〈奥義〉がダブル以上の成功——追加攻撃！`);
+    put("l-flav", fill(pick(F_OUGI_CHAIN),A,D));
+    await sleep(300);
+    await emoAttack(atk,def,ai,di,state,slot,true);
+  }
+  await sleep(380);
+}
+
 async function battle(){
   if(running) return;
   running=true; abort=false;
@@ -1387,26 +1959,33 @@ async function battle(){
 
   const F=[0,1].map(i=>{
     const c=JSON.parse(JSON.stringify(PC[i]));
-    c.max=Math.max(1,c.hp); c.cur=c.max; c.shocked=false; c.skipTurn=false; c.idx=i;
+    c.max=Math.max(1,c.hp); c.cur=c.max; c.shocked=false; c.skipTurn=false; c.dodgeUsed=0; c.idx=i;
     if(!c.name) c.name = i?"キャラクターB":"キャラクターA";
     return c;
   });
   [0,1].forEach(i=>{document.getElementById("f"+i).classList.remove("ko"); setHP(i,F[i].cur,F[i].max);});
 
   put("l-sys", `システム：${sys().name}`);
+  if(sysKey==="emo"){
+    const wn=f=>emoActiveWeapon(f).n;
+    put("l-sys", `${F[0].name}（HP${F[0].max} / イニシアチブ${F[0].emo.init} / 武器：${wn(F[0])}）　対　${F[1].name}（HP${F[1].max} / イニシアチブ${F[1].emo.init} / 武器：${wn(F[1])}）`);
+    put("l-sys", `攻撃を受けた時の対応：${F[0].name}＝${emoDefLabel(0)} ／ ${F[1].name}＝${emoDefLabel(1)}（戦闘中に変更できます）`);
+  }else
   put("l-sys", `${F[0].name}（HP${F[0].max} / DEX${F[0].dex} / DB${F[0].db}）　対　${F[1].name}（HP${F[1].max} / DEX${F[1].dex} / DB${F[1].db}）`);
   if(sysKey==="coc7") put("l-sys", `近接戦闘を受けた時の対応：${F[0].name}＝${defModeOf(0)==="fight"?"応戦":"回避"} ／ ${F[1].name}＝${defModeOf(1)==="fight"?"応戦":"回避"}（戦闘中に変更できます）`);
   await sleep(500);
 
   /* --- 先攻決定 --- */
   let order;
-  if(F[0].dex!==F[1].dex){
-    order = F[0].dex>F[1].dex ? [0,1] : [1,0];
-    put("l-sys", `DEXは ${F[0].name} ${F[0].dex} ／ ${F[1].name} ${F[1].dex}。${F[order[0]].name}が先手を取った。`);
+  const ini = f => sysKey==="emo" ? f.emo.init : f.dex;
+  const iniName = sysKey==="emo" ? "イニシアチブ" : "DEX";
+  if(ini(F[0])!==ini(F[1])){
+    order = ini(F[0])>ini(F[1]) ? [0,1] : [1,0];
+    put("l-sys", `${iniName}は ${F[0].name} ${ini(F[0])} ／ ${F[1].name} ${ini(F[1])}。${F[order[0]].name}が先手を取った。`);
   }else{
     let a,b; do{ a=d(100); b=d(100); }while(a===b);
     await showDice(a,0); await showDice(b,1);
-    put("l-roll", `DEX同値——1d100で先攻決定！　${F[0].name}:${a}　${F[1].name}:${b}`);
+    put("l-roll", `${iniName}同値——1d100で先攻決定！　${F[0].name}:${a}　${F[1].name}:${b}`);
     order = a<b ? [0,1] : [1,0];
     put("l-sys", `値の低い ${F[order[0]].name} が先手！`);
   }
@@ -1420,7 +1999,8 @@ async function battle(){
     const rf=document.getElementById("rflash");
     if(SPEED!==0){ rf.textContent="ROUND "+round; rf.classList.remove("go"); void rf.offsetWidth; rf.classList.add("go"); }
     await sleep(700);
-    const T = sysKey==="coc7" ? turn7 : turn;
+    F.forEach(f=>{ f.dodgeUsed=0; });   /* 回避回数はラウンドごとにリセット */
+    const T = sysKey==="emo" ? turnEmo : (sysKey==="coc7" ? turn7 : turn);
     for(const ai of order){
       if(state.ko>=0||abort) break;
       const di = ai===0?1:0;
@@ -1473,7 +2053,7 @@ document.getElementById("copylog").onclick=()=>{
 renderField(); refreshGauges();
 put("l-sys","システム：クトゥルフ神話TRPG（6版）");
 put("l-round","■□■　ROUND 1　■□■");
-put("l-turn","キャラクターAのターン！");
+put("l-turn", nameTag(0,"キャラクターA")+"のターン！");
 put("l-roll",'キャラクターAのキック！　CCB<=70 ⇒ 63 <b class="s">成功！</b>');
 put("l-flav","鋭いキックをキャラクターBに叩き込む！");
 put("l-roll",'キャラクターBの回避！　CCB<=58 ⇒ 67 <b class="f">失敗！</b>');

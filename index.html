@@ -209,6 +209,9 @@ input:focus,textarea:focus{border-color:var(--azure);outline:none}
 .field>*{min-width:0}
 select{max-width:100%;min-width:0;text-overflow:ellipsis}
 .yujin-note{margin:6px 0 0;font-size:11px;color:var(--phos);line-height:1.6}
+.yujin-note.bad{color:var(--blood-soft)}
+.resnum{display:block;font-family:var(--mono);font-size:11px;color:var(--phos);font-variant-numeric:tabular-nums;text-shadow:0 2px 6px #000}
+.resnum.over{color:var(--blood-soft);font-weight:600}
 .dbnote{margin:6px 0 0;font-size:11px;color:var(--parch-dim);line-height:1.6}
 .dbnote.calc{color:var(--phos)}
 input.dbcalc{border-color:var(--phos);box-shadow:0 0 0 1px rgba(201,162,39,.25)}
@@ -281,7 +284,7 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 <div class="wrap">
 <header class="mast">
   <h1>キャラクター<span class="sep">×</span>決闘場</h1>
-  <p>同一システムのキャラコマデータを2つ入力するだけで、ステータスと戦闘技能だけを頼りに、決着がつくまで殴り合います。ダイスはすべて自動。あなたにできるのは見届けることだけ。</p>
+  <p>同一システムのキャラコマデータを2つ入力するだけで、ステータスと戦闘技能だけを頼りに、決着がつくまで殴り合います。ダイスはすべて自動。</p>
 </header>
 
 <div class="systems" role="group" aria-label="システム選択">
@@ -293,8 +296,8 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 
 <div class="arena" id="arena">
   <div class="gauges">
-    <div class="gauge L"><span class="nm" id="gn0">キャラクターA</span><div class="bar" id="gb0"><i style="width:100%"></i></div><span class="hpnum" id="gh0">HP 13 / 13</span></div>
-    <div class="gauge R"><span class="nm" id="gn1">キャラクターB</span><div class="bar" id="gb1"><i style="width:100%"></i></div><span class="hpnum" id="gh1">HP 12 / 12</span></div>
+    <div class="gauge L"><span class="nm" id="gn0">キャラクターA</span><div class="bar" id="gb0"><i style="width:100%"></i></div><span class="hpnum" id="gh0">HP 13 / 13</span><span class="resnum" id="gr0"></span></div>
+    <div class="gauge R"><span class="nm" id="gn1">キャラクターB</span><div class="bar" id="gb1"><i style="width:100%"></i></div><span class="hpnum" id="gh1">HP 12 / 12</span><span class="resnum" id="gr1"></span></div>
   </div>
   <div class="fighter L" id="f0"></div>
   <div class="fighter R" id="f1"></div>
@@ -329,7 +332,9 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 <footer class="foot">
   ダイス判定・ダメージ算出はすべてこのページ内で完結します<b>（サーバーへの送信はありません）</b>。<br>
   本ツールの「クトゥルフ神話TRPG」「新クトゥルフ神話TRPG」モードは、「株式会社アークライト」及び「株式会社KADOKAWA」が権利を有する『クトゥルフ神話TRPG』シリーズの二次創作物です。<br>
-　本ツールの「エモクロア／ガイアケア」モードは、ダイスタス・コモンズ：クレジット表示不要、改変利用不可、公演利用許可（収益化OK）、営利利用許可です。
+  本ツールの「エモクロア／ガイアケア」モードは、ダイスタス・コモンズ：クレジット表示不要、改変利用不可、公演利用許可（収益化OK）、営利利用許可です。<br>
+  <a href="https://github.com/Akira0141/character-duel/commits/main/index.html">更新履歴</a><br>
+  <a href="https://docs.google.com/forms/u/0/d/e/1FAIpQLSdqc3_vK6fxJnhyPOhkjfvLupuvzPQtxv3KCaR7y2Ier4uUeg/viewform">要望・不具合フォーム</a><br>
 </footer>
 </div>
 
@@ -440,7 +445,7 @@ let sysKey="coc6";
 SYS.emo = {
   name:"エモクロア／ガイアケア",
   cmd:"DM<=",
-  note:"<b>▼レギュレーション（ハウスルール）</b><br>判定は<b>DM</b>。<br><b>イニシアチブ同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br>攻撃技能は<b>ダイス数×目標値が最も高いもの</b>（同値ならダイス数が多い方）を使用、同値最上が複数ある場合は命中時の期待ダメージの平均が高いものを優先。<br>武器はプルダウン選択、自由記入の武器があればそちらを優先。<br>攻撃を受けた時の対応はキャラクターごとに「回避」か「防御」を設定。<br><b>回避</b>は〈＊運動〉〈スピード〉〈ストレングス〉〈アクロバット〉〈ダイブ〉〈危機察知〉のうち最も高いもの使用。同値なら〈危機察知〉優先。<br>回避は<b>1ラウンド1回</b>。〈危機察知〉で回避する場合はレベル回数まで。<br>回避しきれない攻撃は〈耐久〉があれば防御で受ける。<br><b>防御</b>は〈耐久〉が無いと選べない。<br>《融人》のルールは準備中（現在は人間と同じ処理）。",
+  note:"<b>▼レギュレーション（ハウスルール）</b><br>判定は<b>DM</b>。<br><b>イニシアチブ同値</b>なら1d100で出目が<b>低い方が先攻</b>。<br><b>「融人・オリジン使用」の場合</b>は攻撃・回避・防御<b>すべてオリジン使用</b>。<br>オリジンによる共鳴値上昇は選択ルール同様、使用者は毎回、相手は1回目のみ。<br><b>「オリジン不使用」の場合、攻撃</b>技能は<b>ダイス数×目標値が最も高いもの</b>（同値ならダイス数が多い方）を使用、同値最上が複数ある場合は命中時の期待ダメージの平均が高いものを優先。<br><b>武器</b>はプルダウン選択、自由記入の武器があればそちらを優先。<br>攻撃を受けた時の対応はキャラクターごとに<b>「回避」か「防御」を設定</b>。<br><b>「オリジン不使用」時、回避</b>は〈＊運動〉〈スピード〉〈ストレングス〉〈アクロバット〉〈ダイブ〉〈危機察知〉のうち<b>最も高いもの使用</b>。同値なら<b>〈危機察知〉優先</b>。<br>回避は<b>1ラウンド1回</b>。〈危機察知〉で回避する場合はレベル回数まで。<br>回避しきれない攻撃は〈耐久〉があれば防御で受ける。<br><b>防御</b>は〈耐久〉が無いと選べない。<br>武器に<b>変貌した《融人》の肉体</b>を選んだ場合、<b>戦闘開始前に一度だけ</b>〈オリジン〉を振り、その成功数を攻撃力（1D[成功数]）として<b>その戦闘のあいだ固定</b>する。",
   shock:()=>0, shockLabel:()=>"", db:()=>"0"
 };
 const sys = ()=>SYS[sysKey];
@@ -532,6 +537,7 @@ const EMO_SLOTS=[
   {k:"dive",     n:"ダイブ",       grp:"dodge"},
   {k:"kiki",     n:"危機察知",     grp:"dodge"},
   {k:"taikyu",   n:"耐久",         grp:"guard"},
+  {k:"origin",   n:"オリジン",     grp:"origin", dmg:0},
   {k:"konjou",   n:"根性",         grp:"life"},
   {k:"seizon",   n:"＊生存",       grp:"life"}
 ];
@@ -578,11 +584,16 @@ function emoSlotOf(raw){
   if(m) return {k:{"武術":"bujutsu","奥義":"ougi","射撃":"shageki"}[m[1]], name:(m[2]||m[3]||"").trim()};
   const fixed={"＊格闘":"kakutou","格闘":"kakutou","＊投擲":"touteki","投擲":"touteki","＊運動":"undou","運動":"undou",
     "スピード":"speed","ストレングス":"strength","アクロバット":"acro","ダイブ":"dive","危機察知":"kiki",
-    "耐久":"taikyu","根性":"konjou","＊生存":"seizon","生存":"seizon"};
+    "耐久":"taikyu","根性":"konjou","＊生存":"seizon","生存":"seizon","オリジン":"origin"};
   return fixed[t] ? {k:fixed[t], name:""} : null;
 }
 /** 技能の強さ：ダイス数×目標値（同値ならダイス数が多い方をわずかに上に） */
 function emoPow(sl){ return (sl && sl.n>0 && sl.t>0) ? sl.n*sl.t*1000 + sl.n : 0; }
+/** 融人＝オリジン使用で、〈オリジン〉が入力されているか */
+function emoOriginOK(c){
+  const sl=c.emo.sk.origin;
+  return c.emo.kind==="yujin" && !!sl && sl.t>0;
+}
 function emoSkillLabel(slot,sl){ return slot.named ? `${slot.n}${sl&&sl.name?`（${sl.name}）`:""}` : slot.n; }
 function emoWeapon(id){ return EMO_WEAPONS.find(w=>w.id===id) || EMO_WEAPONS[0]; }
 const RE_SUCC=/[\[［]成功数[\]］]/g;
@@ -614,19 +625,22 @@ function sampleEA(){
   c.hp=14; Object.assign(c.emo,{init:7, weapon:"e_body"});
   Object.assign(c.emo.sk.ougi,   {n:2,t:8,name:"徒手空拳"});
   Object.assign(c.emo.sk.kakutou,{n:1,t:6});
-  Object.assign(c.emo.sk.speed,  {n:2,t:7});
-  Object.assign(c.emo.sk.seizon, {n:1,t:5});
+  Object.assign(c.emo.sk.speed,  {n:2,t:8});
+  Object.assign(c.emo.sk.seizon, {n:1,t:6});
   Object.assign(c.emo.sk.konjou, {n:1,t:6});
+  Object.assign(c.emo.sk.origin, {n:2,t:8});
   return c;
 }
 function sampleEB(){
   const c=blank("キャラクターB","#4E8FC7");
   c.hp=16; Object.assign(c.emo,{init:6, weapon:"e_knife"});
   Object.assign(c.emo.sk.kakutou,{n:1,t:6});
-  Object.assign(c.emo.sk.kiki,   {n:2,t:8});
-  Object.assign(c.emo.sk.taikyu, {n:2,t:6});
+  Object.assign(c.emo.sk.kiki,     {n:2,t:8});
+  Object.assign(c.emo.sk.strength, {n:2,t:8});
+  Object.assign(c.emo.sk.taikyu,   {n:2,t:8});
   Object.assign(c.emo.sk.seizon, {n:1,t:6});
   Object.assign(c.emo.sk.konjou, {n:2,t:7});
+  Object.assign(c.emo.sk.origin, {n:1,t:6});
   return c;
 }
 
@@ -735,12 +749,13 @@ function panelEmo(i){
   const hasGuard = emoPow(e.sk.taikyu)>0;
   const row = slot=>{
     const sl=e.sk[slot.k], off=!(sl.n>0&&sl.t>0);
+    const em = slot.k==="origin" ? "＋共鳴 DM&lt;=" : "DM&lt;=";
     const label = slot.named
       ? `<span class="esn"><i>${slot.n}</i><input type="text" class="esname" data-i="${i}" data-es="${slot.k}" data-part="name" value="${esc(sl.name)}" placeholder="名前" aria-label="${slot.n}の名前"></span>`
       : `<span>${slot.n}</span>`;
     return `<div class="esk ${off?"off":""}">${label}
       <input type="number" min="0" max="20" data-i="${i}" data-es="${slot.k}" data-part="n" value="${sl.n}" aria-label="${slot.n}のダイス数">
-      <em>DM&lt;=</em>
+      <em>${em}</em>
       <input type="number" min="0" max="10" data-i="${i}" data-es="${slot.k}" data-part="t" value="${sl.t}" aria-label="${slot.n}の目標値"></div>`;
   };
   const grp = g=>EMO_SLOTS.filter(sl=>sl.grp===g).map(row).join("");
@@ -765,10 +780,12 @@ function panelEmo(i){
         <div><label>HP</label><input type="number" data-i="${i}" data-f="hp" value="${c.hp}"></div>
         <div><label>イニシアチブ</label><input type="number" data-i="${i}" data-ef="init" value="${e.init}"></div>
         <div><label>種別</label><select data-i="${i}" data-ef="kind" aria-label="種別">
-          <option value="human"${e.kind!=="yujin"?" selected":""}>人間</option>
-          <option value="yujin"${e.kind==="yujin"?" selected":""}>融人</option></select></div>
+          <option value="human"${e.kind!=="yujin"?" selected":""}>オリジン不使用</option>
+          <option value="yujin"${e.kind==="yujin"?" selected":""}>融人・オリジン使用</option></select></div>
       </div>
-      ${e.kind==="yujin"?`<p class="yujin-note">《融人》のルールは準備中のため、現在は人間と同じ処理で戦います。</p>`:""}
+      ${e.kind==="yujin" ? `<p class="yujin-note ${emoOriginOK(c)?"":"bad"}" data-ynote="${i}">${emoOriginOK(c)
+        ? "攻撃・回避・防御いずれも〈オリジン〉で行います。使うたびに共鳴が1上がります。"
+        : "〈オリジン〉が未入力です。このままだと通常の技能で戦います。"}</p>` : ""}
       <div class="ewpn ${emoFreeNote(e).on?"overridden":""}" data-wsel="${i}"><label>武器</label><select data-i="${i}" data-ef="weapon" aria-label="武器">${wopts}</select></div>
       <div class="ewfree" data-wfree="${i}">
         <label>自由記入の武器</label>
@@ -781,6 +798,8 @@ function panelEmo(i){
       <div class="skills">
         <h4>攻 撃 技 能</h4>
         ${grp("atk")}
+        <h4 style="margin-top:14px">オ リ ジ ン（融人）</h4>
+        ${grp("origin")}
         <h4 style="margin-top:14px">回 避 ・ 防 御</h4>
         <div class="sk defrow"><span>攻撃を受けた時</span>
           <select data-i="${i}" data-ef="defMode" aria-label="攻撃を受けた時の対応">
@@ -801,6 +820,14 @@ function syncWpnOverride(i){
   const sel=field.querySelector(`.ewpn[data-wsel="${i}"]`), note=field.querySelector(`[data-wfree="${i}"] .ewnote`);
   if(sel) sel.classList.toggle("overridden", st.on);
   if(note){ note.textContent=st.text; note.classList.toggle("on",st.on); note.classList.toggle("bad",st.bad); }
+}
+/** 〈オリジン〉の入力状況に合わせて融人の注記を更新 */
+function syncYujinNote(i){
+  const el=field.querySelector(`[data-ynote="${i}"]`); if(!el) return;
+  const ok=emoOriginOK(PC[i]);
+  el.className="yujin-note"+(ok?"":" bad");
+  el.textContent = ok ? "攻撃・回避・防御いずれも〈オリジン〉で行います。使うたびに共鳴が1上がります。"
+                      : "〈オリジン〉が未入力です。このままだと通常の技能で戦います。";
 }
 /** 〈耐久〉の有無に合わせて「防御する」の選択可否を更新 */
 function syncGuardOption(i){
@@ -888,6 +915,7 @@ function refreshGauges(){
     document.getElementById("gn"+i).textContent = PC[i].name || ("キャラクター"+(i?"B":"A"));
     document.getElementById("gh"+i).textContent = `HP ${PC[i].hp} / ${PC[i].hp}`;
     const bar=document.getElementById("gb"+i);
+    document.getElementById("gr"+i).textContent="";
     bar.classList.remove("low"); bar.firstElementChild.style.width="100%";
     const f=document.getElementById("f"+i);
     f.className="fighter "+(i?"R":"L");
@@ -902,6 +930,7 @@ field.addEventListener("input",e=>{
     sl[part] = part==="name" ? t.value : Math.max(0,parseInt(t.value,10)||0);
     const row=t.closest(".esk"); if(row) row.classList.toggle("off", !(sl.n>0&&sl.t>0));
     if(t.dataset.es==="taikyu") syncGuardOption(i);
+    if(t.dataset.es==="origin") syncYujinNote(i);
     return;
   }
   if(t.dataset.ef){
@@ -1117,10 +1146,12 @@ function importEmo(raw,i){
     if(/gaiacare/i.test(url) && !/^g_/.test(c.emo.weapon)) c.emo.weapon="g_fist";
     if(/emoklore/i.test(url) && !/^e_/.test(c.emo.weapon)) c.emo.weapon="e_body";
   }
-  const re=/(\d+)\s*DM\s*<=\s*(\d+)\s*〈([^〉]+)〉/g; let m;
+  /* 通常の nDM<=t と、(n+{共鳴})DM<=t / ({共鳴}+n)DM<=t の両方を拾う */
+  const re=/(?:\((?:(\d+)\s*\+\s*\{[^}]*\}|\{[^}]*\}\s*\+\s*(\d+))\)|(\d+))\s*DM\s*<=\s*(\d+)\s*〈([^〉]+)〉/g; let m;
   while((m=re.exec(text))!==null){
-    const hit=emoSlotOf(m[3]); if(!hit) continue;
-    const cand={n:+m[1], t:+m[2], name:hit.name};
+    const hit=emoSlotOf(m[5]); if(!hit) continue;
+    const base = m[1]!==undefined ? +m[1] : m[2]!==undefined ? +m[2] : +m[3];
+    const cand={n:base, t:+m[4], name:hit.name};
     const cur=c.emo.sk[hit.k];
     if(emoPow(cand)>emoPow(cur)){ Object.assign(cur,cand); }
     found++;
@@ -1748,7 +1779,25 @@ function emoRollText(r){ return `${r.n}DM<=${r.t} ⇒ [${r.dice.join(", ")}]`; }
 function emoDefMode(i){ const e=PC[i]&&PC[i].emo; return (e && e.defMode==="guard" && emoPow(e.sk.taikyu)>0) ? "guard" : "dodge"; }
 function emoDefLabel(i){ return emoDefMode(i)==="guard" ? "防御" : "回避"; }
 /** 最も強い攻撃技能（同値はランダム） */
+function setRes(i,v){
+  const el=document.getElementById("gr"+i); if(!el) return;
+  el.textContent = "共鳴 "+v+(v>=10?"（逸脱）":"");
+  el.classList.toggle("over", v>=10);
+}
+/** 〈オリジン〉を1回使う：共鳴+1、初回だけ相手の共鳴も+1 */
+function useOrigin(user,ui,other,oi){
+  const before=user.res;
+  user.res+=1; setRes(ui,user.res);
+  put("l-sys", `共鳴が高まる——${user.name}の共鳴 ${before} → ${user.res}`);
+  if(!user.originFirstDone){
+    user.originFirstDone=true;
+    const b2=other.res;
+    other.res+=1; setRes(oi,other.res);
+    put("l-sys", `解き放たれた原種の気配に引かれ、${other.name}の共鳴も ${b2} → ${other.res}`);
+  }
+}
 function emoBestAttack(c){
+  if(emoOriginOK(c)) return EMO_SLOTS.find(sl=>sl.k==="origin");
   const list=EMO_SLOTS.filter(sl=>sl.grp==="atk" && emoPow(c.emo.sk[sl.k])>0);
   if(!list.length) return null;
   const top=Math.max.apply(null, list.map(sl=>emoPow(c.emo.sk[sl.k])));
@@ -1780,40 +1829,59 @@ function emoBestLife(c){
   return best;
 }
 /** ダメージ算出 */
-function emoDamage(atk,slot,succ){
+function emoDamage(atk,slot,succ,res){
   const w=emoActiveWeapon(atk);
+  /* 〈オリジン〉は共鳴9まで【成功数】、共鳴10以上で【成功数】D4 */
+  const face = slot.k==="origin" ? (((res||atk.res||1)>=10) ? 4 : 0) : slot.dmg;
   let total=0; const lab=[], det=[];
-  if(slot.dmg>0){
-    const r=rollTerms([{t:"d",sign:1,n:succ,f:slot.dmg}]);
-    total+=r.total; lab.push(`${succ}D${slot.dmg}`);
-    det.push(`${succ}D${slot.dmg}:${r.parts[0].rolls.join("+")}`);
+  if(face>0){
+    const r=rollTerms([{t:"d",sign:1,n:succ,f:face}]);
+    total+=r.total; lab.push(`${succ}D${face}`);
+    det.push(`${succ}D${face}:${r.parts[0].rolls.join("+")}`);
   }else{
     total+=succ; lab.push(`成功数${succ}`);
   }
-  const wexpr = String(w.p).replace(RE_SUCC, String(Math.max(1,succ)));
+  /* 変貌した《融人》の肉体は、戦闘前に決めた成功数で固定（bodyVal） */
+  const fixedBody = (w.id==="g_yujin" && atk.bodyVal!==undefined);
+  const wexpr = fixedBody ? (atk.bodyVal>0 ? `1d${atk.bodyVal}` : "0")
+                          : String(w.p).replace(RE_SUCC, String(Math.max(1,succ)));
   const wt=parseExpr(wexpr), wr=rollTerms(wt);
   if(wt.length && !(wt.length===1 && wt[0].t==="c" && wt[0].v===0)){
     total+=wr.total;
     lab.push(exprLabel(wt).toUpperCase());
     wr.parts.forEach(pt=>{ if(pt.rolls) det.push(`武器${pt.label.toUpperCase()}:${pt.rolls.join("+")}`); });
   }
+  /* 〈ストレングス〉のレベル分だけ固定値で加算 */
+  const st=atk.emo.sk.strength;
+  if(st && st.n>0 && st.t>0){
+    total+=st.n;
+    lab.push(`${st.n}`);
+    det.push(`ストレングス+${st.n}`);
+  }
   return {dmg:Math.max(0,total), label:lab.join("＋"), detail:det.join(" / ")};
 }
 const F_OUGI=["{A}の奥義が冴え渡る——狙いは{D}！","研ぎ澄まされた一撃。{A}の奥義が{D}を捉えにいく！","{A}は全身の力を一点に集め、奥義を放った！"];
 const F_OUGI_CHAIN=["勢いは止まらない——{A}はそのまま追撃に移る！","返す一手で、{A}の奥義がもう一度閃く！"];
+const F_ORIGIN=["{A}の内側で原種の力がざわめく——{D}へ！","人ならざる気配が膨れ上がり、{D}に襲いかかる！","{A}はオリジンを解き放った！"];
+const F_ORIGIN_DEF=["{D}の輪郭が歪み、攻撃はすり抜けていった！","原種の力が{D}を覆う——傷ひとつ残らない！"];
 const F_GUARD=["{D}は身を固め、衝撃を正面から受け止めにいく！","{D}は腕を交差させ、真っ向から受ける構えだ！"];
 const F_GUTS_OK=["止まりかけた鼓動が、もう一度強く打った。{A}はまだ倒れない！","歯を食いしばり、{A}はぎりぎりで踏みとどまった！"];
 const F_ARREST=["{A}の胸の奥で、何かが静かに止まった。","{A}の体から力が抜け、床に崩れ落ちる。"];
-const EMO_FLAV={kakutou:FLAV.punch, bujutsu:FLAV.kick, ougi:F_OUGI, touteki:FLAV.throw, shageki:FLAV.handgun};
+const EMO_FLAV={kakutou:FLAV.punch, bujutsu:FLAV.kick, ougi:F_OUGI, touteki:FLAV.throw, shageki:FLAV.handgun, origin:F_ORIGIN};
 
 async function emoAttack(atk,def,ai,di,state,slot,isExtra){
   const A=atk.name, D=def.name, sl=atk.emo.sk[slot.k];
   const nm=emoSkillLabel(slot,sl), ex=isExtra?"（追加攻撃）":"";
-  put("l-roll", `${A}の〈${nm}〉${ex}！　${sl.n}DM<=${sl.t} ⇒ <span>?</span>`);
+  const isOri = slot.k==="origin";
+  const an = isOri ? sl.n + atk.res : sl.n;   /* オリジンはダイス数に現在の共鳴を加える */
+  const oriRes = atk.res;                    /* ダメージ判定にも、振った時点の共鳴を使う */
+  const atkName = isOri ? `〈オリジン〉で攻撃` : `〈${nm}〉`;
+  put("l-roll", `${A}の${atkName}${ex}！　${an}DM<=${sl.t}${isOri?`（${sl.n}＋共鳴${atk.res}）`:""} ⇒ <span>?</span>`);
   const line=logEl.lastElementChild;
-  const ra=emoRoll(sl.n,sl.t);
+  const ra=emoRoll(an,sl.t);
   await showDiceN(ra.dice, ai, `成功数 ${ra.succ}`);
-  line.innerHTML=`${A}の〈${nm}〉${ex}！　${emoRollText(ra)} ${emoTag(ra)}`;
+  line.innerHTML=`${A}の${atkName}${ex}！　${emoRollText(ra)}${isOri?`（${sl.n}＋共鳴）`:""} ${emoTag(ra)}`;
+  if(isOri) useOrigin(atk,ai,def,di);
   await sleep(200);
   const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
   put("l-flav", fill(pick(ra.succ>0 ? (EMO_FLAV[slot.k]||F_FREE) : F_MISS),A,D).replace(/\{S\}/g,nm));
@@ -1824,6 +1892,29 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
   }
 
   /* --- 防御側の対応 --- */
+  if(emoOriginOK(def)){
+    const dsl=def.emo.sk.origin, dn=dsl.n+def.res;
+    await sleep(260);
+    const rd=emoRoll(dn,dsl.t);
+    await showDiceN(rd.dice, di, `成功数 ${rd.succ}`);
+    put("l-roll", `${D}の〈オリジン〉で防御！　${emoRollText(rd)}（${dsl.n}＋共鳴） ${emoTag(rd)}`);
+    useOrigin(def,di,atk,ai);
+    await sleep(240);
+    if(rd.succ>=ra.succ){
+      put("l-flav", fill(pick(F_ORIGIN_DEF),A,D));
+      fx(fd, di===0?"dodgeL":"dodgeR", 420); popup(di,"MISS","miss");
+      await sleep(560); return ra;
+    }
+    put("l-flav", fill(pick(F_DODGE_NG),A,D));
+    const r0=emoDamage(atk,slot,ra.succ,oriRes);
+    await sleep(280);
+    put("l-roll", `${r0.label} ⇒ ${r0.dmg}${r0.detail?`　<span style="color:#5B677C">（${r0.detail}）</span>`:""}`);
+    put("l-dmg", `${r0.dmg}のダメージ！`);
+    fx(fd,"hitshake",340); popup(di,"-"+r0.dmg);
+    const cl0=document.getElementById("clash"); if(SPEED!==0){cl0.classList.remove("go");void cl0.offsetWidth;cl0.classList.add("go");}
+    await applyDamageEmo(def,di,r0.dmg,state,A);
+    return ra;
+  }
   const hasGuard=emoPow(def.emo.sk.taikyu)>0;
   let mode=emoDefMode(di);
   if(mode==="guard" && !hasGuard) mode="dodge";
@@ -1862,7 +1953,7 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
   }
 
   /* --- ダメージ --- */
-  const r=emoDamage(atk,slot,ra.succ);
+  const r=emoDamage(atk,slot,ra.succ,oriRes);
   await sleep(280);
   put("l-roll", `${r.label} ⇒ ${r.dmg}${r.detail?`　<span style="color:#5B677C">（${r.detail}）</span>`:""}`);
   const fin=Math.max(0, r.dmg-reduce);
@@ -1960,6 +2051,7 @@ async function battle(){
   const F=[0,1].map(i=>{
     const c=JSON.parse(JSON.stringify(PC[i]));
     c.max=Math.max(1,c.hp); c.cur=c.max; c.shocked=false; c.skipTurn=false; c.dodgeUsed=0; c.idx=i;
+    c.res=1; c.originFirstDone=false;
     if(!c.name) c.name = i?"キャラクターB":"キャラクターA";
     return c;
   });
@@ -1969,7 +2061,9 @@ async function battle(){
   if(sysKey==="emo"){
     const wn=f=>emoActiveWeapon(f).n;
     put("l-sys", `${F[0].name}（HP${F[0].max} / イニシアチブ${F[0].emo.init} / 武器：${wn(F[0])}）　対　${F[1].name}（HP${F[1].max} / イニシアチブ${F[1].emo.init} / 武器：${wn(F[1])}）`);
-    put("l-sys", `攻撃を受けた時の対応：${F[0].name}＝${emoDefLabel(0)} ／ ${F[1].name}＝${emoDefLabel(1)}（戦闘中に変更できます）`);
+    put("l-sys", `攻撃を受けた時の対応：${F[0].name}＝${emoOriginOK(F[0])?"オリジン":emoDefLabel(0)} ／ ${F[1].name}＝${emoOriginOK(F[1])?"オリジン":emoDefLabel(1)}（戦闘中に変更できます）`);
+    [0,1].forEach(k=>setRes(k,F[k].res));
+    if(emoOriginOK(F[0])||emoOriginOK(F[1])) put("l-sys", `共鳴はどちらも1から。〈オリジン〉を使うたびに1ずつ高まる。`);
   }else
   put("l-sys", `${F[0].name}（HP${F[0].max} / DEX${F[0].dex} / DB${F[0].db}）　対　${F[1].name}（HP${F[1].max} / DEX${F[1].dex} / DB${F[1].db}）`);
   if(sysKey==="coc7") put("l-sys", `近接戦闘を受けた時の対応：${F[0].name}＝${defModeOf(0)==="fight"?"応戦":"回避"} ／ ${F[1].name}＝${defModeOf(1)==="fight"?"応戦":"回避"}（戦闘中に変更できます）`);
@@ -1990,6 +2084,32 @@ async function battle(){
     put("l-sys", `値の低い ${F[order[0]].name} が先手！`);
   }
   await sleep(600);
+
+  /* --- 変貌した《融人》の肉体：戦闘前に一度だけ〈オリジン〉を振り、攻撃力を固定する --- */
+  if(sysKey==="emo"){
+    for(const i of order){
+      const f=F[i], w=emoActiveWeapon(f);
+      if(w.id!=="g_yujin") continue;
+      const o=f.emo.sk.origin;
+      put("l-sys", `${f.name}は《融人》の肉体へ変貌する——攻撃力を決めるため〈オリジン〉！`);
+      if(!(o && o.t>0)){
+        f.bodyVal=0;
+        put("l-sys", `だが${f.name}は〈オリジン〉を持たない。変貌できず、肉体の攻撃力は0のまま。`);
+        await sleep(400);
+        continue;
+      }
+      const dn=o.n+f.res, rr=emoRoll(dn,o.t);
+      await sleep(260);
+      await showDiceN(rr.dice, i, `成功数 ${rr.succ}`);
+      put("l-roll", `${f.name}の〈オリジン〉で変貌！　${emoRollText(rr)}（${o.n}＋共鳴） ${emoTag(rr)}`);
+      useOrigin(f, i, F[i===0?1:0], i===0?1:0);
+      f.bodyVal=Math.max(0,rr.succ);
+      put("l-flav", f.bodyVal>0
+        ? `${f.name}の肉体が音を立てて作り変えられていく——この戦いのあいだ、その攻撃力は 1D${f.bodyVal} だ。`
+        : `${f.name}の変貌は形にならなかった。肉体の攻撃力は0のまま。`);
+      await sleep(500);
+    }
+  }
 
   const state={ko:-1};
   const MAXR=30;
@@ -2016,6 +2136,8 @@ async function battle(){
     document.getElementById("f"+state.ko).classList.add("ko");
     put("l-end", `WINNER — ${winner.name}`);
     put("l-flav", `${loser.name}は倒れ伏し、${winner.name}だけが立っていた。残りHPは ${Math.max(0,winner.cur)} / ${winner.max}。`);
+    if(sysKey==="emo" && winner.res>=10)
+      put("l-flav", `——だが、その輪郭はもう人のものではない。共鳴は${winner.res}。原種の力に浸食され、${winner.name}は逸脱してしまった……。`);
     document.getElementById("logmeta").textContent=`決着（${round-1}ラウンド）`;
   }else{
     const w = F[0].cur===F[1].cur ? null : (F[0].cur>F[1].cur?F[0]:F[1]);

@@ -668,28 +668,29 @@ function freeDBMode(c){
 /* 初期表示用のサンプルキャラクター（例示用の数値です） */
 function sampleA(){
   const c=blank("キャラクターA","#C9A227");
-  Object.assign(c,{hp:13,con:13,dex:15,db:"1d4",dodge:65});
-  Object.assign(c.skills,{kick:70,punch:55,headbutt:40,grapple:45,katana:60,martial:35});
+  Object.assign(c,{hp:12,con:12,dex:10,db:"1d4",dodge:70});
+  Object.assign(c.skills,{punch:50,throw:40,handgun:50,katana:80});
+  c.wpn.throw="1d6"; c.wpn.handgun="1d10";
   return c;
 }
 function sampleB(){
   const c=blank("キャラクターB","#4E8FC7");
-  Object.assign(c,{hp:12,con:12,dex:13,db:"0",dodge:58});
-  Object.assign(c.skills,{punch:50,kick:35,handgun:65,knife:55,throw:40});
-  c.wpn.handgun="1d10"; c.wpn.knife="1d4"; c.wpn.throw="1d6";
+  Object.assign(c,{hp:13,con:13,dex:18,db:"0",dodge:70});
+  Object.assign(c.skills,{punch:50,handgun:80});
+  c.wpn.handgun="1d10";
   return c;
 }
 /* 7版サンプル（例示用の数値です） */
 function sample7A(){
   const c=blank("キャラクターA","#C9A227");
-  Object.assign(c,{hp:12,con:60,dex:65,db:"1d4",dodge:55});
-  Object.assign(c.skills,{fight:62,sword:45});
+  Object.assign(c,{hp:10,con:50,dex:75,db:"1d4",dodge:67});
+  Object.assign(c.skills,{fight:80});
   return c;
 }
 function sample7B(){
   const c=blank("キャラクターB","#4E8FC7");
-  Object.assign(c,{hp:11,con:55,dex:60,db:"0",dodge:64});
-  Object.assign(c.skills,{fight:50,shoot:60,throw:40});
+  Object.assign(c,{hp:12,con:60,dex:65,db:"1d4",dodge:71});
+  Object.assign(c.skills,{fight:75,shoot:75});
   return c;
 }
 const PC=[sampleA(),sampleB()];

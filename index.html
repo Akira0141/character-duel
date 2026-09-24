@@ -335,6 +335,7 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
   本ツールの「エモクロア／ガイアケア」モードは、ダイスタス・コモンズ：クレジット表示不要、改変利用不可、公演利用許可（収益化OK）、営利利用許可です。<br>
   <a href="https://github.com/Akira0141/character-duel/commits/main/index.html">更新履歴</a><br>
   <a href="https://docs.google.com/forms/u/0/d/e/1FAIpQLSdqc3_vK6fxJnhyPOhkjfvLupuvzPQtxv3KCaR7y2Ier4uUeg/viewform">要望・不具合フォーム</a><br>
+  作者/Twitter：真田 晶/@Akira_TRPG0141
 </footer>
 </div>
 
@@ -354,6 +355,8 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
       </ul>
       <b>ダメージボーナスについて</b><br>
       貼り付けたデータに<b>ダメージボーナス（DB）</b>が含まれていれば、その値をそのまま使います。含まれていない場合のみ STR＋SIZ から自動算出します（いあきゃらのココフォリア駒出力にはDBが含まれないため、自動算出になります）。シート上でDBを手動で変更している場合は、読み込み後にDB欄を直接書き換えてください。<br><br>
+      <b>技能の初期値について</b><br>
+      データに含まれていなかった戦闘技能には<b>初期値</b>を入れます（回避は6版がDEX×2、7版がDEX÷2）。ただし銃器・投擲・ナイフの<b>武器ダメージ欄は空のまま</b>なので、そのままでは使いません。使わせたい場合は武器ダメージを入力してください。<br><br>
       反映後は念のため数値を目視で確認してください。書式の違いで拾い漏れた項目は手入力できます。
     </p>
     </div>
@@ -468,7 +471,7 @@ const ATK6 = [
 const ATK7 = [
   {k:"fight", n:"近接戦闘（格闘）", dice:"1d3", db:"full", melee:true},
   {k:"sword", n:"近接戦闘（刀剣）", wpn:"1d10", db:"full", melee:true, impale:true},
-  {k:"throw", n:"投擲",             wpn:"1d3",  db:"half"},
+  {k:"throw7", n:"投擲",            wpn:"1d3",  db:"half"},
   {k:"shoot", n:"射撃（拳銃）",     wpn:"1d10", db:"none", impale:true}
 ];
 const ALL_ATK = ATK6.concat(ATK7);
@@ -496,7 +499,7 @@ const ALIAS6 = {
 const ALIAS7 = {
   fight:["近接戦闘(格闘)","近接戦闘","格闘","こぶし(パンチ)","こぶし","パンチ"],
   sword:["近接戦闘(刀剣)","刀剣","日本刀","刀"],
-  throw:["投擲","投てき"],
+  throw7:["投擲","投てき"],
   shoot:["射撃(拳銃)","拳銃","ハンドガン"],
   dodge:["回避","かいひ"]
 };
@@ -1161,10 +1164,28 @@ function importEmo(raw,i){
   return found ? c : null;
 }
 
+/* 技能の初期値（データに無かった技能だけを埋める） */
+const INIT6={kick:25,grapple:25,punch:50,headbutt:10,throw:25,handgun:20,smg:15,shotgun:30,
+             machinegun:15,rifle:25,katana:15,knife:25,martial:1,budo:1};
+const INIT7={fight:25,sword:20,throw7:20,shoot:20};
+/** 読み込んだデータに無かった技能へ初期値を入れる（武器ダメージ欄は空のまま） */
+function applyCocDefaults(c){
+  const tbl = sysKey==="coc7" ? INIT7 : INIT6, list=atks();
+  for(const k in tbl){
+    if(c.skills[k]>0) continue;
+    c.skills[k]=tbl[k];
+    const a=list.find(x=>x.k===k);
+    if(a && a.wpn!==undefined) c.wpn[k]="";   /* 初期値で埋めた技能には武器を持たせない */
+  }
+  if(!(c.dodge>0) && c.dex>0) c.dodge = sysKey==="coc7" ? Math.floor(c.dex/2) : c.dex*2;
+  return c;
+}
+
 function importData(raw,i){
   if(sysKey==="emo") return importEmo(raw,i);
   const c = blank(PC[i].name, PC[i].color);
   c.img = PC[i].img;
+  c.dodge = 0;   /* データに回避があれば上書きされる。無ければ初期値を入れる */
   c.freeName = PC[i].freeName; c.wpn.free = PC[i].wpn.free; c.skills.free = PC[i].skills.free;
   c.defMode = PC[i].defMode; c.freeImpale = PC[i].freeImpale; c.freeKind = PC[i].freeKind; c.freeDB = PC[i].freeDB; c.freeHalfDB = PC[i].freeHalfDB;
   let found=0, obj=null;
@@ -1174,14 +1195,14 @@ function importData(raw,i){
   if(obj && Array.isArray(obj.TBAP)){
     found += fromCharasheetJson(obj,c);
     atks().filter(a=>a.wpn!==undefined).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
-    return c;
+    return applyCocDefaults(c);
   }
   /* --- 0b. キャラクター保管所 テキスト出力 --- */
   if(!obj && /《[^》]*》[\s　]*\d{1,3}\s*[%％]/.test(raw)){
     found += fromCharasheetText(raw,c);
     if(found){
       atks().filter(a=>a.wpn!==undefined).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
-      return c;
+      return applyCocDefaults(c);
     }
   }
 
@@ -1222,7 +1243,8 @@ function importData(raw,i){
     found += fromCommands(raw,c);
   }
   if(!found) return null;
-  return c;
+  atks().filter(a=>a.wpn!==undefined).forEach(a=>{ if(c.skills[a.k]>0 && !c.wpn[a.k]) c.wpn[a.k]=a.wpn; });
+  return applyCocDefaults(c);
 }
 /** "CCB<=70 【キック】" / "キック 70" / "キック：70" を拾う */
 function fromCommands(text,c){
@@ -1350,7 +1372,7 @@ document.getElementById("dlgParse").onclick=()=>{
     return setStatus(`「${c.name}」を反映しました（HP ${c.hp} / イニシアチブ ${e.init} / 攻撃技能 ${atkN} 件${emoPow(e.sk.taikyu)>0?"":" / 〈耐久〉なし"}）。武器と種別を選び、数値をご確認ください。`,"ok");
   }
   const got=Object.values(c.skills).filter(v=>v>0).length;
-  setStatus(`「${c.name}」を反映しました（戦闘技能 ${got} 件 / HP ${c.hp} / CON ${c.con} / DEX ${c.dex} / DB ${c.db}）。数値をご確認ください。`,"ok");
+  setStatus(`「${c.name}」を反映しました（戦闘技能 ${got} 件 / HP ${c.hp} / CON ${c.con} / DEX ${c.dex} / DB ${c.db}）。データに無かった技能には初期値を入れています。数値をご確認ください。`,"ok");
 };
 /** ログの名前をキャラクターの色で表示（暗い色は背景色つきで読みやすく） */
 function nameTag(i,name){
@@ -1495,7 +1517,10 @@ async function turn(atk,def,ai,di,state){
   }
   /* --- 攻撃ロール（マーシャルアーツ／武道があれば組み合わせロール） --- */
   const sk=atk.skills[a.k];
-  const maSkill = a.ma ? MA.find(m=>atk.skills[m.k]>0) : null;
+  /* マーシャルアーツと武道は高い方を採用（同値ならマーシャルアーツ） */
+  const maSkill = a.ma
+    ? (MA.filter(m=>atk.skills[m.k]>0).sort((x,y)=>atk.skills[y.k]-atk.skills[x.k])[0] || null)
+    : null;
   const maVal = maSkill ? atk.skills[maSkill.k] : 0;
   const cmdLabel = maSkill ? `CBRB(${sk},${maVal})` : `${sys().cmd}${sk}`;
   put("l-roll", `${A}の${a.n}${maSkill?`＋${maSkill.n}`:""}！　${cmdLabel} ⇒ <span>?</span>`);

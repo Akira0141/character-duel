@@ -82,6 +82,20 @@ header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 24px;borde
 .fighter.R{right:var(--fin)}
 .fighter img{max-height:var(--fh);max-width:var(--fw);object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
 .fighter svg{width:var(--sw);height:var(--sh)}
+.fighter.R .pict{transform:scaleX(-1)}
+.pict{overflow:visible}
+.pict g{transition:transform .18s ease}
+.pict .armF,.pict .armB{transform-origin:30px 30px}
+.pict .legF,.pict .legB{transform-origin:30px 56px}
+.pict .prop{display:none}
+.fighter .auraimg{position:absolute;left:-14%;right:-14%;top:-6%;bottom:-6%;border-radius:50%;
+  opacity:0;transition:opacity .35s;pointer-events:none}
+.fighter .auraimg.aura-on{opacity:1;animation:auraPulse 2.2s ease-in-out infinite}
+.shot{position:absolute;width:10px;height:10px;border-radius:50%;z-index:4;
+  transition:transform .42s cubic-bezier(.35,0,.75,1);box-shadow:0 0 10px rgba(0,0,0,.55)}
+.pict .aura{opacity:0;transform-origin:30px 52px;transition:opacity .35s}
+.pict.aura-on .aura{opacity:1;animation:auraPulse 2.2s ease-in-out infinite}
+@keyframes auraPulse{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.06);opacity:1}}
 .lungeR{transform:translateX(62px) rotate(-4deg)}
 .lungeL{transform:translateX(-62px) rotate(4deg)}
 .hitshake{animation:shake .32s linear}
@@ -274,7 +288,7 @@ footer.foot{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;co
 @media (max-width:860px){
   .field{grid-template-columns:1fr;gap:14px}
   .vs{padding:0;font-size:22px}
-  :root{--ah:236px; --fw:104px; --fh:150px; --fin:19%; --sw:72px; --sh:118px;}
+  :root{--ah:236px; --fw:104px; --fh:150px; --fin:12%; --sw:72px; --sh:118px;}
   body.bigart{--ah:400px; --fw:140px; --fh:300px; --fin:6%; --sw:96px; --sh:160px;}
   .fighter{bottom:6px}
   .die{width:36px;height:36px;font-size:13px}.dieres{font-size:20px}
@@ -741,10 +755,136 @@ function readable(hex){
 
 /* ---------- UI: character panels ---------- */
 const field=document.getElementById("field");
+/** 先細りの手足（両端の太さが違う塗り図形）を作る */
+function limbPath(x1,y1,r1,x2,y2,r2,color){
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1;
+  const nx=-dy/len, ny=dx/len, f=v=>v.toFixed(1);
+  const pts=[[x1+nx*r1,y1+ny*r1],[x2+nx*r2,y2+ny*r2],[x2-nx*r2,y2-ny*r2],[x1-nx*r1,y1-ny*r1]]
+    .map(q=>f(q[0])+" "+f(q[1])).join(" L ");
+  return `<path d="M ${pts} Z" fill="${color}"/>`
+       + `<circle cx="${x1}" cy="${y1}" r="${r1}" fill="${color}"/>`
+       + `<circle cx="${x2}" cy="${y2}" r="${r2}" fill="${color}"/>`;
+}
+/* ピクトグラム。腕・脚はグループごと回転させてポーズを作る */
+let _pictId=0;
 function stick(color){
-  return `<svg viewBox="0 0 60 100" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" aria-hidden="true">
-  <circle cx="30" cy="14" r="10" fill="none"/><path d="M30 24 V60"/><path d="M30 32 L12 46"/><path d="M30 32 L48 46"/>
-  <path d="M30 60 L16 92"/><path d="M30 60 L44 92"/></svg>`;
+  const id="au"+(++_pictId);
+  return `<svg class="pict" data-aid="${id}" viewBox="0 0 60 100" aria-hidden="true">
+  <defs>
+    <radialGradient id="${id}">
+      <stop offset="0%" stop-color="${color}" stop-opacity=".50"/>
+      <stop offset="55%" stop-color="${color}" stop-opacity=".24"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}h">
+      <stop offset="0%" stop-color="#D9584B" stop-opacity=".58"/>
+      <stop offset="55%" stop-color="#D9584B" stop-opacity=".28"/>
+      <stop offset="100%" stop-color="#D9584B" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse class="aura" cx="30" cy="52" rx="33" ry="45" fill="url(#${id})"/>
+  <g class="armB">${limbPath(30,30,4.8,8,44,2.8,color)}</g>
+  <g class="legB">${limbPath(30,56,6,17,92,3.2,color)}</g>
+  <rect class="torso" x="23" y="26" width="14" height="31" rx="6.5" fill="${color}"/>
+  <circle class="head" cx="30" cy="15" r="8.6" fill="${color}"/>
+  <g class="legF">${limbPath(30,56,6,43,92,3.2,color)}</g>
+  <g class="armF">${limbPath(30,30,4.8,52,44,2.8,color)}
+    <path class="prop sword" d="M52 44 L86 27" stroke="${color}" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path class="prop gun" d="M48 40.5 H68 V45.5 H58.5 L56.5 52.5 L51 52.5 L53 45.5 H48 Z" fill="${color}"/>
+    <circle class="prop ball" cx="56" cy="45" r="4.5" fill="${color}"/>
+  </g></svg>`;
+}
+/* 行動ごとのポーズ（腕2本・脚2本の角度と、手に持つもの） */
+const POSES={
+  idle:   {aF:33,   aB:-33,   lF:12,  lB:-12, prop:null},
+  punch:  {aF:-33,  aB:-43,   lF:-15, lB:18,  prop:null},   /* 前腕を水平に伸ばし、後ろ腕は体側に下ろす */
+  kick:   {aF:-8,   aB:-128,  lF:-85, lB:-16, prop:null},
+  grab:   {aF:-28,  aB:-143,  lF:-20, lB:20,  prop:null},
+  swingUp:{aF:-93,  aB:-28,   lF:-5,  lB:5,   prop:"sword"},
+  swing:  {aF:-21,  aB:-28,   lF:-9,  lB:10,  prop:"sword"},
+  shoot:  {aF:-33,  aB:-48,   lF:8,   lB:-8,  prop:"gun"},
+  throw:  {aF:-113, aB:-128,  lF:-12, lB:14,  prop:"ball"},
+  throwEnd:{aF:-12, aB:-128,  lF:-16, lB:18,  prop:null},   /* 投げたあと腕を振り下ろす */
+  hit:    {aF:-18,  aB:18,    lF:-14, lB:16,  prop:null},
+  dodge:  {aF:-58,  aB:8,     lF:-20, lB:22,  prop:null},
+  ko:     {aF:38,   aB:-38,   lF:-6,  lB:6,   prop:null}
+};
+/* 攻撃技能 → ポーズ */
+const POSE_BY_ATK={
+  kick:"kick", grapple:"grab", punch:"punch", headbutt:"punch",
+  throw:"throw", throw7:"throw", handgun:"shoot", smg:"shoot", shotgun:"shoot",
+  machinegun:"shoot", rifle:"shoot", katana:"swing", knife:"swing",
+  fight:"punch", sword:"swing", shoot:"shoot",
+  kakutou:"punch", bujutsu:"kick", ougi:"swing", touteki:"throw", shageki:"shoot",
+  origin:"punch", free:"punch"
+};
+/** ポーズを切り替える（立ち絵を入れている場合は何もしない） */
+const _poseSeq=[0,0];
+function setPose(i,pose){
+  if(SPEED===0 && pose!=="ko" && pose!=="idle") return;
+  const f=document.getElementById("f"+i); if(!f) return;
+  const svg=f.querySelector("svg.pict"); if(!svg) return;
+  const apply=(name)=>{
+    const p=POSES[name]||POSES.idle;
+    const rot=(sel,deg)=>{ const el=svg.querySelector(sel); if(el) el.style.transform="rotate("+deg+"deg)"; };
+    rot(".armF",p.aF); rot(".armB",p.aB); rot(".legF",p.lF); rot(".legB",p.lB);
+    svg.querySelectorAll(".prop").forEach(el=>{
+      el.style.display = (p.prop && el.classList.contains(p.prop)) ? "block" : "none";
+    });
+  };
+  const seq=++_poseSeq[i];
+  if(pose==="swing"){          /* 振りかぶってから振り下ろす */
+    apply("swingUp");
+    setTimeout(()=>{ if(_poseSeq[i]===seq) apply("swing"); }, 200);
+    return;
+  }
+  apply(pose);
+  if(pose==="throw"){          /* 構えたあとに投げつける */
+    setTimeout(()=>{
+      if(_poseSeq[i]!==seq) return;
+      apply("throwEnd");
+      throwFx(i);
+    }, 220);
+  }
+}
+function poseFor(a){ return (a && POSE_BY_ATK[a.k]) || "punch"; }
+/** 投擲物が相手へ飛ぶ演出 */
+function throwFx(i){
+  if(SPEED===0) return;
+  const arena=document.getElementById("arena");
+  const fa=document.getElementById("f"+i), fd=document.getElementById("f"+(i===0?1:0));
+  if(!arena||!fa||!fd) return;
+  const ar=arena.getBoundingClientRect(), a=fa.getBoundingClientRect(), b=fd.getBoundingClientRect();
+  const x0=(i===0 ? a.right-a.width*0.18 : a.left+a.width*0.18)-ar.left;
+  const x1=(i===0 ? b.left+b.width*0.45  : b.right-b.width*0.45)-ar.left;
+  const y =a.top+a.height*0.38-ar.top;
+  const el=document.createElement("div");
+  el.className="shot";
+  el.style.left=(x0-5)+"px"; el.style.top=(y-5)+"px";
+  el.style.background=(PC[i]&&PC[i].color)||"#C9A227";
+  arena.appendChild(el);
+  requestAnimationFrame(()=>{ el.style.transform="translateX("+(x1-x0)+"px) rotate(540deg)"; });
+  setTimeout(()=>el.remove(), 620);
+}
+/** 《融人》のオーラ表示（共鳴10以上で赤く） */
+function rgbaOf(hex,a){
+  const h=String(hex||"#C9A227").replace("#","");
+  const r=parseInt(h.substr(0,2),16), g=parseInt(h.substr(2,2),16), b=parseInt(h.substr(4,2),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function setAura(i,on,hot){
+  const f=document.getElementById("f"+i); if(!f) return;
+  const svg=f.querySelector("svg.pict");
+  if(svg){
+    svg.classList.toggle("aura-on",!!on);
+    svg.classList.toggle("aura-hot",!!hot);
+    const el=svg.querySelector(".aura"), id=svg.dataset.aid;
+    if(el && id) el.setAttribute("fill","url(#"+id+(hot?"h":"")+")");
+    return;
+  }
+  /* 立ち絵のときは画像の背後に同じ光を出す */
+  const im=f.querySelector(".auraimg"); if(!im) return;
+  const c = hot ? "#D9584B" : ((PC[i]&&PC[i].color)||(i?"#4E8FC7":"#C9A227"));
+  im.style.background=`radial-gradient(closest-side, ${rgbaOf(c,.55)}, ${rgbaOf(c,.24)} 55%, ${rgbaOf(c,0)})`;
+  im.classList.toggle("aura-on",!!on);
 }
 /* エモクロア／ガイアケアの入力パネル */
 function panelEmo(i){
@@ -923,7 +1063,7 @@ function refreshGauges(){
     bar.classList.remove("low"); bar.firstElementChild.style.width="100%";
     const f=document.getElementById("f"+i);
     f.className="fighter "+(i?"R":"L");
-    f.innerHTML = PC[i].img ? `<img src="${PC[i].img}" alt="">` : stick(PC[i].color||(i?"#4E8FC7":"#C9A227"));
+    f.innerHTML = PC[i].img ? `<span class="auraimg"></span><img src="${PC[i].img}" alt="">` : stick(PC[i].color||(i?"#4E8FC7":"#C9A227"));
   }
 }
 field.addEventListener("input",e=>{
@@ -1503,6 +1643,7 @@ function chooseAttack(c){
 
 async function turn(atk,def,ai,di,state){
   const A=atk.name, D=def.name;
+  setPose(ai,"idle"); setPose(di,"idle");
   put("l-turn", `${nameTag(ai,A)}のターン！`);
   await sleep(320);
   if(atk.skipTurn){
@@ -1535,23 +1676,27 @@ async function turn(atk,def,ai,di,state){
   else tag = rollTag(res);
   line.innerHTML = `${A}の${a.n}${maSkill?`＋${maSkill.n}`:""}！　${cmdLabel} ⇒ ${res.r} ${tag}`;
 
+  const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
   if(res.fum){
     await sleep(240);
+    setPose(ai, poseFor(a));
+    fx(fa, ai===0?"lungeR":"lungeL", 420);
     put("l-flav", fill(pick(F_FUMBLE),A,D));
     put("l-sys", `${A}は次の攻撃ができない！（回避は可能）`);
     atk.skipTurn = true;
-    fx(document.getElementById("f"+ai),"hitshake",320);
     await sleep(600); return;
   }
   if(!res.ok){
     await sleep(240);
+    setPose(ai, poseFor(a));
+    fx(fa, ai===0?"lungeR":"lungeL", 420);
     put("l-flav", fill(pick(F_MISS),A,D));
     await sleep(560); return;
   }
   /* --- 演出：踏み込み --- */
   await sleep(200);
   put("l-flav", fill(pick(FLAV[a.k]||F_FREE),A,D).replace(/\{S\}/g,a.n));
-  const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
+  setPose(ai, poseFor(a));
   fx(fa, ai===0?"lungeR":"lungeL", 420);
   if(maOK){ await sleep(240); put("l-flav", fill(pick(F_MA),A,D)); }
 
@@ -1569,6 +1714,8 @@ async function turn(atk,def,ai,di,state){
     await sleep(240);
     put("l-flav", fill(pick(dodged?F_DODGE_OK:F_DODGE_NG),A,D));
     if(dodged){
+      setPose(di,"dodge");
+      setPose(di,"dodge");
       fx(fd, di===0?"dodgeL":"dodgeR", 420);
       popup(di,"MISS","miss");
       await sleep(620); return;
@@ -1601,6 +1748,7 @@ async function turn(atk,def,ai,di,state){
   await sleep(300);
   put("l-roll", `${label} ⇒ ${dmg}${detail?`　<span style="color:#5B677C">（${detail}）</span>`:""}`);
   put("l-dmg", `${dmg}のダメージ！`);
+  setPose(di,"hit");
   fx(fd,"hitshake",340); popup(di,"-"+dmg);
   const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
 
@@ -1699,6 +1847,7 @@ function dmg7calc(ch,a,lv){
 function defModeOf(i){ return (PC[i] && PC[i].defMode==="fight") ? "fight" : "dodge"; }
 async function turn7(atk,def,ai,di,state){
   const A=atk.name, D=def.name;
+  setPose(ai,"idle"); setPose(di,"idle");
   put("l-turn", `${nameTag(ai,A)}のターン！`);
   await sleep(320);
   const a=chooseAttack(atk);
@@ -1719,6 +1868,7 @@ async function turn7(atk,def,ai,di,state){
   await sleep(200);
   put("l-flav", fill(pick(ra.ok ? (FLAV[a.k]||F_FREE) : (ra.fum?F_FUMBLE:F_MISS)),A,D).replace(/\{S\}/g,a.n));
   const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
+  setPose(ai, poseFor(a));
   fx(fa, ai===0?"lungeR":"lungeL", 420);
 
   /* --- 攻撃が失敗し、防御側が「回避」なら回避ロールは行わない --- */
@@ -1747,11 +1897,13 @@ async function turn7(atk,def,ai,di,state){
     await sleep(280);
     put("l-roll", `${r.label} ⇒ ${r.dmg}${r.detail?`　<span style="color:#5B677C">（${r.detail}）</span>`:""}`);
     put("l-dmg", `${r.dmg}のダメージ！`);
+    setPose(di,"hit");
     fx(fd,"hitshake",340); popup(di,"-"+r.dmg);
     const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
     await applyDamage(def,di,r.dmg,state,A);
   }else if(counter){
     put("l-flav", fill(pick(F_COUNTER),A,D));
+    setPose(di,"punch"); setPose(ai,"hit");
     fx(fd, di===0?"lungeR":"lungeL", 420);
     const cd=ATK7[0];
     const r=dmg7calc(def,cd,rd.lv);
@@ -1809,6 +1961,11 @@ function setRes(i,v){
   const el=document.getElementById("gr"+i); if(!el) return;
   el.textContent = "共鳴 "+v+(v>=10?"（逸脱）":"");
   el.classList.toggle("over", v>=10);
+  if(v>=10){
+    const f=document.getElementById("f"+i);
+    const on=f&&(f.querySelector("svg.pict.aura-on")||f.querySelector(".auraimg.aura-on"));
+    if(on) setAura(i,true,true);
+  }
 }
 /** 〈オリジン〉を1回使う：共鳴+1、初回だけ相手の共鳴も+1 */
 function useOrigin(user,ui,other,oi){
@@ -1911,6 +2068,7 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
   await sleep(200);
   const fa=document.getElementById("f"+ai), fd=document.getElementById("f"+di);
   put("l-flav", fill(pick(ra.succ>0 ? (EMO_FLAV[slot.k]||F_FREE) : F_MISS),A,D).replace(/\{S\}/g,nm));
+  setPose(ai, poseFor(slot));
   fx(fa, ai===0?"lungeR":"lungeL", 420);
   if(ra.succ<=0){
     put("l-sys", `攻撃が届いていないため、${D}は${emoDefLabel(di)}を行わない。`);
@@ -1928,7 +2086,7 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
     await sleep(240);
     if(rd.succ>=ra.succ){
       put("l-flav", fill(pick(F_ORIGIN_DEF),A,D));
-      fx(fd, di===0?"dodgeL":"dodgeR", 420); popup(di,"MISS","miss");
+      setPose(di,"dodge"); fx(fd, di===0?"dodgeL":"dodgeR", 420); popup(di,"MISS","miss");
       await sleep(560); return ra;
     }
     put("l-flav", fill(pick(F_DODGE_NG),A,D));
@@ -1936,6 +2094,7 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
     await sleep(280);
     put("l-roll", `${r0.label} ⇒ ${r0.dmg}${r0.detail?`　<span style="color:#5B677C">（${r0.detail}）</span>`:""}`);
     put("l-dmg", `${r0.dmg}のダメージ！`);
+    setPose(di,"hit");
     fx(fd,"hitshake",340); popup(di,"-"+r0.dmg);
     const cl0=document.getElementById("clash"); if(SPEED!==0){cl0.classList.remove("go");void cl0.offsetWidth;cl0.classList.add("go");}
     await applyDamageEmo(def,di,r0.dmg,state,A);
@@ -1957,7 +2116,7 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
       await sleep(240);
       if(rd.succ>=ra.succ){
         put("l-flav", fill(pick(F_DODGE_OK),A,D));
-        fx(fd, di===0?"dodgeL":"dodgeR", 420); popup(di,"MISS","miss");
+        setPose(di,"dodge"); fx(fd, di===0?"dodgeL":"dodgeR", 420); popup(di,"MISS","miss");
         await sleep(560); return ra;
       }
       put("l-flav", fill(pick(F_DODGE_NG),A,D));
@@ -1989,6 +2148,7 @@ async function emoAttack(atk,def,ai,di,state,slot,isExtra){
     popup(di,"0","miss"); await sleep(520); return ra;
   }
   put("l-dmg", `${fin}のダメージ！`);
+  setPose(di,"hit");
   fx(fd,"hitshake",340); popup(di,"-"+fin);
   const cl=document.getElementById("clash"); if(SPEED!==0){cl.classList.remove("go");void cl.offsetWidth;cl.classList.add("go");}
   await applyDamageEmo(def,di,fin,state,A);
@@ -2049,6 +2209,7 @@ async function applyDamageEmo(v,vi,dmg,state,srcName){
 
 async function turnEmo(atk,def,ai,di,state){
   const A=atk.name, D=def.name;
+  setPose(ai,"idle"); setPose(di,"idle");
   put("l-turn", `${nameTag(ai,A)}のターン！`);
   await sleep(320);
   const slot=emoBestAttack(atk);
@@ -2081,14 +2242,14 @@ async function battle(){
     if(!c.name) c.name = i?"キャラクターB":"キャラクターA";
     return c;
   });
-  [0,1].forEach(i=>{document.getElementById("f"+i).classList.remove("ko"); setHP(i,F[i].cur,F[i].max);});
+  [0,1].forEach(i=>{document.getElementById("f"+i).classList.remove("ko"); setPose(i,"idle"); setAura(i,false,false); setHP(i,F[i].cur,F[i].max);});
 
   put("l-sys", `システム：${sys().name}`);
   if(sysKey==="emo"){
     const wn=f=>emoActiveWeapon(f).n;
     put("l-sys", `${F[0].name}（HP${F[0].max} / イニシアチブ${F[0].emo.init} / 武器：${wn(F[0])}）　対　${F[1].name}（HP${F[1].max} / イニシアチブ${F[1].emo.init} / 武器：${wn(F[1])}）`);
     put("l-sys", `攻撃を受けた時の対応：${F[0].name}＝${emoOriginOK(F[0])?"オリジン":emoDefLabel(0)} ／ ${F[1].name}＝${emoOriginOK(F[1])?"オリジン":emoDefLabel(1)}（戦闘中に変更できます）`);
-    [0,1].forEach(k=>setRes(k,F[k].res));
+    [0,1].forEach(k=>{ setRes(k,F[k].res); setAura(k, emoOriginOK(F[k]), false); });
     if(emoOriginOK(F[0])||emoOriginOK(F[1])) put("l-sys", `共鳴はどちらも1から。〈オリジン〉を使うたびに1ずつ高まる。`);
   }else
   put("l-sys", `${F[0].name}（HP${F[0].max} / DEX${F[0].dex} / DB${F[0].db}）　対　${F[1].name}（HP${F[1].max} / DEX${F[1].dex} / DB${F[1].db}）`);
@@ -2159,6 +2320,7 @@ async function battle(){
   if(abort){ put("l-sys","戦闘は中断された。"); }
   else if(state.ko>=0){
     const loser=F[state.ko], winner=F[state.ko===0?1:0];
+    setPose(state.ko,"ko");
     document.getElementById("f"+state.ko).classList.add("ko");
     put("l-end", `WINNER — ${winner.name}`);
     put("l-flav", `${loser.name}は倒れ伏し、${winner.name}だけが立っていた。残りHPは ${Math.max(0,winner.cur)} / ${winner.max}。`);
